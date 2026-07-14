@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --color-augur-green: #00c853;
+  --color-augur-green-dark: #00a844;
+  --color-augur-red: #e53935;
+  --color-augur-amber: #f59e0b;
+  --color-surface: #ffffff;
+  --color-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-row-hover: #f9fafb;
+}
+
+html {
+  font-family: var(--font-sans);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #fafafa;
+  color: #111827;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Report tab hero — soft slate, not white / not near-black */
+.report-hero {
+  background-color: #c5ced9 !important;
+  color: #3a4556;
+  text-align: center;
+}
+
+.report-hero__title {
+  color: #2c3544;
+}
+
+.report-hero__accent {
+  color: #1b7a45;
+}
+
+.report-hero__sub {
+  color: #5a6578;
+}
+
+.report-hero__count {
+  color: #2c3544;
+  font-weight: 500;
+}
