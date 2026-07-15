@@ -287,7 +287,8 @@ export function StakeForm({
         onClick={() => onStake(outcomeIndex, betNum)}
         className="w-full rounded-lg bg-augur-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-augur-green-dark disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {cta} — bet {betNum > 0 ? formatRep(betNum) : '…'} REP to win{' '}
+        {cta} {query.outcomes[outcomeIndex]} — bet{' '}
+        {betNum > 0 ? formatRep(betNum) : '…'} REP to win{' '}
         {betNum > 0 ? formatRep(toWin) : '…'} REP
       </button>
 

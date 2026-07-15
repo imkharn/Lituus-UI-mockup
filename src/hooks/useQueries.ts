@@ -12,9 +12,12 @@ export function useQueries() {
   const [state, dispatch] = useReducer(appReducer, initialState)
 
   useEffect(() => {
+    // Tick every second so sub-hour timers (which show seconds) update live.
+    // Longer remaining times still format to hours/days, so the display only
+    // visibly changes when those larger units roll over.
     const id = window.setInterval(() => {
-      dispatch({ type: 'TICK', ms: 60_000 })
-    }, 60_000)
+      dispatch({ type: 'TICK', ms: 1_000 })
+    }, 1_000)
     return () => window.clearInterval(id)
   }, [])
 
