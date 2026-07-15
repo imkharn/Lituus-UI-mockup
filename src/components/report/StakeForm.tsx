@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import type { MockQuery } from '../../types/query'
 import { currentReporterPay, toWinBreakdown } from '../../lib/profit'
 import { mockStats } from '../../data/mockQueries'
-import { formatRep, formatUsd } from '../../lib/actions'
+import { formatRep, formatTimeRemaining, formatUsd } from '../../lib/actions'
 
 interface StakeFormProps {
   query: MockQuery
@@ -38,7 +38,8 @@ export function StakeForm({
   const [bet, setBet] = useState<string>(String(maxStake))
   const [touched, setTouched] = useState(true)
   const [childChoice, setChildChoice] = useState(0)
-  const [migrateInput, setMigrateInput] = useState<string>('')
+  // Prefill migrate amount with the full wallet balance (MAX) by default.
+  const [migrateInput, setMigrateInput] = useState<string>(String(walletBalance))
 
   const repPrice = mockStats.repPriceUsd
   const betNum = Number(bet) || 0
@@ -75,11 +76,25 @@ export function StakeForm({
 
   if (isMigrate && query.forkInfo) {
     // Fork queries are downcast to a binary affirm/deny question about the
-    // outcome the fork bond was staked on.
-    const forkOutcomeLabel =
+    // most recently reported (tentative) outcome. The child universes are:
+    //   Affirm → that outcome was valid
+    //   Deny   → that outcome was NOT valid
+    const tentativeLabel =
       query.outcomes[query.tentativeOutcome ?? 0] ?? 'the reported outcome'
-    const forkQuestion = `Before Unix timestamp ${Math.floor(query.createdAt / 1000)}, ${forkOutcomeLabel} was a valid answer to the question: ${query.question}`
+    const baseQuestion = query.question.replace(/\s*\[[^\]]+\]\s*$/, '')
+    const outcomeList = `[${query.outcomes
+      .map((o, i) => {
+        const hex =
+          i === query.outcomes.length - 1
+            ? 'FF'
+            : i.toString(16).padStart(2, '0').toUpperCase()
+        return `${hex}=${o}`
+      })
+      .join(',')}]`
+    const forkQuestion = `Before Unix timestamp ${Math.floor(query.createdAt / 1000)}, ${tentativeLabel} was a valid answer to the question: ${baseQuestion} ${outcomeList}`
     const migrateNum = Number(migrateInput) || 0
+    const migrateTarget =
+      childChoice === 0 ? tentativeLabel : `not ${tentativeLabel}`
 
     return (
       <div className="space-y-4">
@@ -89,7 +104,9 @@ export function StakeForm({
           </p>
           <p className="mt-1 text-xs text-amber-800">
             Fork state {query.forkInfo.forkState}: migrate your REP into the
-            child universe you believe is correct.
+            child universe you believe is correct. If you fail to migrate in the
+            next {formatTimeRemaining(query.timeRemainingMs)} your REP will
+            become worthless.
           </p>
         </div>
         <div>
@@ -145,10 +162,11 @@ export function StakeForm({
         <button
           type="button"
           disabled={migrateNum <= 0 || migrateNum > walletBalance}
-          onClick={() => onMigrate(FORK_CHILDREN[childChoice], migrateNum)}
+          onClick={() => onMigrate(migrateTarget, migrateNum)}
           className="w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          Migrate {migrateNum > 0 ? `${formatRep(migrateNum)} ` : ''}REP
+          Migrate {migrateNum > 0 ? `${formatRep(migrateNum)} ` : ''}REP to{' '}
+          {migrateTarget}
         </button>
         <InfoBlock query={{ ...query, question: forkQuestion }} />
       </div>
