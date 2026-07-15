@@ -80,11 +80,12 @@ export function QueryList({
       </div>
 
       {/* Column headers */}
-      <div className="hidden border-b border-border bg-gray-50 px-4 py-1 text-xs font-medium uppercase tracking-wide text-gray-500 lg:grid lg:grid-cols-[auto_minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-3 lg:px-6 lg:pl-[3.25rem]">
+      <div className="hidden border-b border-border bg-gray-50 px-4 py-1 text-xs font-medium uppercase tracking-wide text-gray-500 lg:grid lg:grid-cols-[auto_minmax(0,2fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.85fr)_minmax(0,0.85fr)] lg:gap-3 lg:px-6 lg:pl-[3.25rem]">
         <span />
         <span>Title</span>
         <span>Outcome</span>
         <span>Bond</span>
+        <span>Available profit</span>
         <span>Time remaining</span>
       </div>
 

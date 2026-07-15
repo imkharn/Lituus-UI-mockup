@@ -261,6 +261,12 @@ export function StakeForm({
             </span>
           </div>
           <div className="flex items-center justify-between">
+            <span>80% of Losing Bonds</span>
+            <span className="font-medium text-gray-900">
+              {formatRep(breakdown.losingShare)} REP
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
             <span>Tip</span>
             <span className="font-medium text-gray-900">
               {formatRep(breakdown.tip)} REP
@@ -305,14 +311,12 @@ function InfoBlock({ query }: { query: MockQuery }) {
         )}
       </p>
       <p>
-        Invalid is always an outcome. Questions outside the{' '}
         <a
           href="#reporting-guide"
           className="font-medium text-gray-900 underline underline-offset-2"
         >
-          reporting guide
-        </a>{' '}
-        (ambiguous timing, subjective criteria) should resolve Invalid.
+          Reporting guide
+        </a>
       </p>
     </div>
   )

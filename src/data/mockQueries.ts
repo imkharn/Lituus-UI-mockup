@@ -1,5 +1,5 @@
 import type { ChartPoint, MockQuery, MockStats, MockWallet, StakeEvent } from '../types/query'
-import { FORK_BOND_REP } from '../lib/profit'
+import { FORK_BOND_REP, PROTOCOL_FEE_REP } from '../lib/profit'
 
 const MIN = 60_000
 const HOUR = 60 * MIN
@@ -70,9 +70,11 @@ function escalation(
 
 const INVALID_BINARY = 2
 
+const FEE = PROTOCOL_FEE_REP
+
 const e1 = escalation(
   '1',
-  5,
+  FEE,
   3,
   [
     { owner: USER, outcome: 1, isUser: true },
@@ -85,7 +87,7 @@ const e1 = escalation(
 /** Second bond-at-risk: user reported, then got appealed — must restake soon. */
 const e1b = escalation(
   '1b',
-  4,
+  FEE,
   3,
   [
     { owner: USER, outcome: 0, isUser: true },
@@ -98,7 +100,7 @@ const e1b = escalation(
 /** Third bond-at-risk: user lost the latest round and must appeal. */
 const e1c = escalation(
   '1c',
-  3,
+  FEE,
   3,
   [
     { owner: R1, outcome: 1 },
@@ -111,7 +113,7 @@ const e1c = escalation(
 
 const e2 = escalation(
   '2',
-  6,
+  FEE,
   4,
   [
     { owner: R1, outcome: 0 },
@@ -141,7 +143,7 @@ const e2 = escalation(
 
 const e3 = escalation(
   '3',
-  5,
+  FEE,
   3,
   [
     { owner: R1, outcome: 0 },
@@ -153,11 +155,11 @@ const e3 = escalation(
   30,
 )
 
-const e5 = escalation('5', 6, 3, [{ owner: R1, outcome: 1 }], [], 10)
+const e5 = escalation('5', FEE, 3, [{ owner: R1, outcome: 1 }], [], 10)
 
 const e6 = escalation(
   '6',
-  4,
+  FEE,
   3,
   [
     { owner: R1, outcome: 0 },
@@ -169,7 +171,7 @@ const e6 = escalation(
 
 const e7 = escalation(
   '7',
-  4,
+  FEE,
   3,
   [
     { owner: R1, outcome: 1 },
@@ -182,7 +184,7 @@ const e7 = escalation(
 
 const e8 = escalation(
   '8',
-  5,
+  FEE,
   3,
   [
     { owner: R1, outcome: 0 },
@@ -209,12 +211,12 @@ const e8 = escalation(
   4,
 )
 
-const e13 = escalation('13', 9, 3, [{ owner: R1, outcome: 1 }], [], 6)
-const e14 = escalation('14', 6.5, 3, [{ owner: R2, outcome: 1 }], [], 2)
+const e13 = escalation('13', FEE, 3, [{ owner: R1, outcome: 1 }], [], 6)
+const e14 = escalation('14', FEE, 3, [{ owner: R2, outcome: 1 }], [], 2)
 
 const e20 = escalation(
   '20',
-  3,
+  FEE,
   3,
   [
     { owner: R1, outcome: 0 },
@@ -226,15 +228,15 @@ const e20 = escalation(
   28,
 )
 
-const e21 = escalation('21', 2, 3, [{ owner: R1, outcome: 1 }], [], 200)
-const e22 = escalation('22', 2, 3, [{ owner: R2, outcome: 1 }], [], 300)
+const e21 = escalation('21', FEE, 3, [{ owner: R1, outcome: 1 }], [], 200)
+const e22 = escalation('22', FEE, 3, [{ owner: R2, outcome: 1 }], [], 300)
 
 export const initialQueries: MockQuery[] = [
   {
     id: 1,
     question: 'Will ETH ETF approval happen by Q3? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 5,
+    fee: FEE,
     createdAt: e1.stakes[0].timestamp - 7 * HOUR,
     appealBond: e1.nextBond,
     tentativeOutcome: 0,
@@ -253,7 +255,7 @@ export const initialQueries: MockQuery[] = [
     id: 23,
     question: 'Will the SEC approve a Solana ETF this year? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 4,
+    fee: FEE,
     createdAt: e1b.stakes[0].timestamp - 14 * HOUR,
     appealBond: e1b.nextBond,
     tentativeOutcome: 1,
@@ -273,7 +275,7 @@ export const initialQueries: MockQuery[] = [
     id: 24,
     question: 'Will crude oil close above $90 this month? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 3,
+    fee: FEE,
     createdAt: e1c.stakes[0].timestamp - 3 * HOUR,
     appealBond: e1c.nextBond,
     tentativeOutcome: 1,
@@ -292,7 +294,7 @@ export const initialQueries: MockQuery[] = [
     id: 2,
     question: 'Which outcome won the 2024 election fork? [0=A,1=B,2=C]',
     outcomes: ['Candidate A', 'Candidate B', 'Candidate C', 'Invalid'],
-    fee: 6,
+    fee: FEE,
     createdAt: e2.stakes[0].timestamp - 19 * HOUR,
     appealBond: e2.lastBond,
     tentativeOutcome: 1,
@@ -322,7 +324,7 @@ export const initialQueries: MockQuery[] = [
     id: 3,
     question: 'Did BTC exceed $100k in 2025? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 5,
+    fee: FEE,
     createdAt: e3.stakes[0].timestamp - 11 * HOUR,
     appealBond: 0,
     tentativeOutcome: 1,
@@ -341,9 +343,9 @@ export const initialQueries: MockQuery[] = [
     id: 4,
     question: 'Will Fed cut rates in March? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 4.2,
+    fee: FEE,
     createdAt: NOW - 30 * HOUR,
-    appealBond: 4.2,
+    appealBond: FEE,
     tentativeOutcome: INVALID_BINARY,
     finalOutcome: null,
     totalStakedByOutcome: [0, 0, 0],
@@ -361,7 +363,7 @@ export const initialQueries: MockQuery[] = [
     id: 5,
     question: 'Will SpaceX land Starship successfully this year? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 6,
+    fee: FEE,
     createdAt: e5.stakes[0].timestamp - 22 * HOUR,
     appealBond: e5.nextBond,
     tentativeOutcome: 1,
@@ -381,7 +383,7 @@ export const initialQueries: MockQuery[] = [
     id: 6,
     question: 'Will UK rejoin EU by 2030? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 4,
+    fee: FEE,
     createdAt: e6.stakes[0].timestamp - 5 * HOUR,
     appealBond: e6.nextBond,
     tentativeOutcome: 1,
@@ -400,7 +402,7 @@ export const initialQueries: MockQuery[] = [
     id: 7,
     question: 'Will global temps rise >1.5°C by 2030? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 4,
+    fee: FEE,
     createdAt: e7.stakes[0].timestamp - 16 * HOUR,
     appealBond: e7.nextBond,
     tentativeOutcome: 1,
@@ -419,7 +421,7 @@ export const initialQueries: MockQuery[] = [
     id: 8,
     question: 'Will OpenAI release AGI in 2026? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 5,
+    fee: FEE,
     createdAt: e8.stakes[0].timestamp - 8 * HOUR,
     appealBond: e8.nextBond,
     tentativeOutcome: 0,
@@ -438,9 +440,9 @@ export const initialQueries: MockQuery[] = [
     id: 9,
     question: 'Will Ethereum average under 5 gwei this month? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 3.5,
+    fee: FEE,
     createdAt: NOW - 10 * HOUR,
-    appealBond: 3.5,
+    appealBond: FEE,
     tentativeOutcome: INVALID_BINARY,
     finalOutcome: null,
     totalStakedByOutcome: [0, 0, 0],
@@ -458,9 +460,9 @@ export const initialQueries: MockQuery[] = [
     id: 10,
     question: 'Will Apple release AR glasses this year? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 9,
+    fee: FEE,
     createdAt: NOW - 66 * HOUR,
-    appealBond: 9,
+    appealBond: FEE,
     tentativeOutcome: INVALID_BINARY,
     finalOutcome: null,
     totalStakedByOutcome: [0, 0, 0],
@@ -478,9 +480,9 @@ export const initialQueries: MockQuery[] = [
     id: 11,
     question: 'Will Tesla hit 3M deliveries this year? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 2,
+    fee: FEE,
     createdAt: NOW - 68 * HOUR,
-    appealBond: 2,
+    appealBond: FEE,
     tentativeOutcome: INVALID_BINARY,
     finalOutcome: null,
     totalStakedByOutcome: [0, 0, 0],
@@ -497,9 +499,9 @@ export const initialQueries: MockQuery[] = [
     id: 12,
     question: 'Will UEFA expand to 36 teams? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 1.5,
+    fee: FEE,
     createdAt: NOW - 63 * HOUR,
-    appealBond: 1.5,
+    appealBond: FEE,
     tentativeOutcome: INVALID_BINARY,
     finalOutcome: null,
     totalStakedByOutcome: [0, 0, 0],
@@ -517,7 +519,7 @@ export const initialQueries: MockQuery[] = [
     id: 13,
     question: 'Will Japan raise rates this quarter? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 9,
+    fee: FEE,
     createdAt: e13.stakes[0].timestamp - 2 * HOUR,
     appealBond: e13.nextBond,
     tentativeOutcome: 1,
@@ -537,7 +539,7 @@ export const initialQueries: MockQuery[] = [
     id: 14,
     question: 'Will Nvidia top $4T market cap? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 6.5,
+    fee: FEE,
     createdAt: e14.stakes[0].timestamp - 18 * HOUR,
     appealBond: e14.nextBond,
     tentativeOutcome: 1,
@@ -556,9 +558,9 @@ export const initialQueries: MockQuery[] = [
     id: 15,
     question: 'Will WHO declare a new pandemic this year? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 3,
+    fee: FEE,
     createdAt: NOW - 36 * HOUR,
-    appealBond: 3,
+    appealBond: FEE,
     tentativeOutcome: INVALID_BINARY,
     finalOutcome: null,
     totalStakedByOutcome: [0, 0, 0],
@@ -576,9 +578,9 @@ export const initialQueries: MockQuery[] = [
     id: 16,
     question: 'Will EU pass AI Act amendment this year? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 2.2,
+    fee: FEE,
     createdAt: NOW - 14 * HOUR,
-    appealBond: 2.2,
+    appealBond: FEE,
     tentativeOutcome: INVALID_BINARY,
     finalOutcome: null,
     totalStakedByOutcome: [0, 0, 0],
@@ -595,9 +597,9 @@ export const initialQueries: MockQuery[] = [
     id: 17,
     question: 'Will Solana flip ETH daily tx count this month? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 1.8,
+    fee: FEE,
     createdAt: NOW - 2 * HOUR,
-    appealBond: 1.8,
+    appealBond: FEE,
     tentativeOutcome: INVALID_BINARY,
     finalOutcome: null,
     totalStakedByOutcome: [0, 0, 0],
@@ -615,9 +617,9 @@ export const initialQueries: MockQuery[] = [
     id: 18,
     question: 'Who wins 2028 US election? [0=Democrat,1=Republican,2=Independent]',
     outcomes: ['Democrat', 'Republican', 'Independent', 'Invalid'],
-    fee: 5,
+    fee: FEE,
     createdAt: NOW - 60 * HOUR,
-    appealBond: 5,
+    appealBond: FEE,
     tentativeOutcome: 3,
     finalOutcome: null,
     totalStakedByOutcome: [0, 0, 0, 0],
@@ -635,9 +637,9 @@ export const initialQueries: MockQuery[] = [
     id: 19,
     question: 'Will Argentina dollarize by 2027? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 4,
+    fee: FEE,
     createdAt: NOW - 64 * HOUR,
-    appealBond: 4,
+    appealBond: FEE,
     tentativeOutcome: INVALID_BINARY,
     finalOutcome: null,
     totalStakedByOutcome: [0, 0, 0],
@@ -655,7 +657,7 @@ export const initialQueries: MockQuery[] = [
     id: 20,
     question: 'Did ETH merge succeed? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 3,
+    fee: FEE,
     createdAt: e20.stakes[0].timestamp - 9 * HOUR,
     appealBond: 0,
     tentativeOutcome: 1,
@@ -674,7 +676,7 @@ export const initialQueries: MockQuery[] = [
     id: 21,
     question: 'Did the 2024 Olympics open on time? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 2,
+    fee: FEE,
     createdAt: e21.stakes[0].timestamp - 21 * HOUR,
     appealBond: 0,
     tentativeOutcome: 1,
@@ -694,7 +696,7 @@ export const initialQueries: MockQuery[] = [
     id: 22,
     question: 'Was Bitcoin halving in April 2024? [0=false,1=true]',
     outcomes: ['No', 'Yes', 'Invalid'],
-    fee: 2,
+    fee: FEE,
     createdAt: e22.stakes[0].timestamp - 4 * HOUR,
     appealBond: 0,
     tentativeOutcome: 1,

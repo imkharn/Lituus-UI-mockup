@@ -4,6 +4,7 @@ import {
   formatRep,
   formatTimeRemaining,
 } from '../../lib/actions'
+import { availableProfit } from '../../lib/profit'
 import { QueryExpanded } from './QueryExpanded'
 
 interface QueryRowProps {
@@ -47,6 +48,10 @@ export function QueryRow({
   const outcomeHeader =
     query.columnMode === 'preAppeal' ? 'Resolves to' : 'Tentative outcome'
 
+  const profit = availableProfit(query, walletBalance)
+  const profitLabel =
+    profit == null ? '–' : `${formatRep(profit)} REP`
+
   return (
     <div
       className={clsx(
@@ -57,7 +62,7 @@ export function QueryRow({
       <button
         type="button"
         onClick={onToggle}
-        className="grid w-full grid-cols-[auto_1fr] items-center gap-3 px-4 py-2 text-left sm:px-6 lg:grid-cols-[auto_minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.9fr)]"
+        className="grid w-full grid-cols-[auto_1fr] items-center gap-3 px-4 py-2 text-left sm:px-6 lg:grid-cols-[auto_minmax(0,2fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.85fr)_minmax(0,0.85fr)]"
       >
         <span
           className={clsx(
@@ -88,13 +93,14 @@ export function QueryRow({
               </span>
             )}
           </div>
-          <div className="mt-1 flex gap-4 text-xs text-gray-500 lg:hidden">
+          <div className="mt-1 flex flex-wrap gap-4 text-xs text-gray-500 lg:hidden">
             <span>
               {outcomeHeader}: {outcomeLabel}
             </span>
             <span>
               {bondHeader}: {bondLabel}
             </span>
+            <span>Available profit: {profitLabel}</span>
             <span>{formatTimeRemaining(query.timeRemainingMs)}</span>
           </div>
         </div>
@@ -105,6 +111,9 @@ export function QueryRow({
         <div className="hidden min-w-0 lg:block">
           <p className="text-xs text-gray-500">{bondHeader}</p>
           <p className="text-sm text-gray-900">{bondLabel}</p>
+        </div>
+        <div className="hidden min-w-0 lg:block">
+          <p className="text-sm text-gray-900">{profitLabel}</p>
         </div>
         <div className="hidden min-w-0 lg:block">
           <p className="text-xs text-gray-500">Time remaining</p>
