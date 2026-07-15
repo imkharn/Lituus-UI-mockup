@@ -297,6 +297,12 @@ export function StakeForm({
               {formatRep(breakdown.reporterPay)} REP
             </span>
           </div>
+          <div className="mt-1 flex items-center justify-between border-t border-border pt-1">
+            <span>To win</span>
+            <span className="font-semibold text-gray-900">
+              {formatRep(toWin)} REP
+            </span>
+          </div>
         </div>
       )}
 

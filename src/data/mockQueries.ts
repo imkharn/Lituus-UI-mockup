@@ -97,20 +97,6 @@ const e1b = escalation(
   23.7, // ~18 min left
 )
 
-/** Third bond-at-risk: user lost the latest round and must appeal. */
-const e1c = escalation(
-  '1c',
-  FEE,
-  3,
-  [
-    { owner: R1, outcome: 1 },
-    { owner: USER, outcome: 0, isUser: true },
-    { owner: R3, outcome: 1 },
-  ],
-  [19.4, 11.2],
-  23.25, // ~45 min left
-)
-
 const e2 = escalation(
   '2',
   FEE,
@@ -187,9 +173,6 @@ const e8 = escalation(
   FEE,
   3,
   [
-    { owner: R1, outcome: 0 },
-    { owner: R2, outcome: 1 },
-    { owner: R3, outcome: 0 },
     { owner: R1, outcome: 1 },
     { owner: R2, outcome: 0 },
     { owner: R3, outcome: 1 },
@@ -202,12 +185,8 @@ const e8 = escalation(
     { owner: R1, outcome: 0 },
     { owner: R2, outcome: 1 },
     { owner: R3, outcome: 0 },
-    { owner: R1, outcome: 1 },
-    { owner: R2, outcome: 0 },
-    { owner: R3, outcome: 1 },
-    { owner: R1, outcome: 0 },
   ],
-  [12, 5, 20, 8, 16, 3, 22, 11, 7, 18, 4, 15, 9, 21, 2, 14, 19, 6],
+  [12, 5, 20, 8, 16, 3, 22, 11, 7, 18, 4],
   4,
 )
 
@@ -274,27 +253,6 @@ export const initialQueries: MockQuery[] = [
     userHasLosingBond: true,
     hasOpenAppeal: true,
     tip: 2,
-  },
-  {
-    id: 24,
-    question: 'Will crude oil close above $90 this month? [0=false,1=true]',
-    description:
-      'This market resolves Yes if the front-month WTI crude oil futures contract (CL1) settles at or above $90.00 per barrel on any trading day during the current calendar month, per the official NYMEX settlement price published by CME Group. Intraday spikes that do not hold into the settlement price do not count. Otherwise this market resolves No.',
-    outcomes: ['No', 'Yes', 'Invalid'],
-    fee: FEE,
-    createdAt: e1c.stakes[0].timestamp - 3 * HOUR,
-    appealBond: e1c.nextBond,
-    tentativeOutcome: 1,
-    finalOutcome: null,
-    totalStakedByOutcome: e1c.totals,
-    stakes: e1c.stakes,
-    timeRemainingMs: 45 * MIN,
-    columnMode: 'activeAppeal',
-    category: 'required_appeal_urgent',
-    isResolved: false,
-    claimableAmount: 0,
-    userHasLosingBond: true,
-    hasOpenAppeal: true,
   },
   {
     id: 2,

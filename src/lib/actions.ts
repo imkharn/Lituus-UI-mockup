@@ -209,6 +209,11 @@ export function formatUsd(n: number): string {
 }
 
 export function formatRep(n: number): string {
+  // REP amounts under 100 are shown as whole numbers; larger amounts keep up to
+  // two decimals.
+  if (Math.abs(n) < 100) {
+    return Math.round(n).toLocaleString()
+  }
   return n.toLocaleString(undefined, { maximumFractionDigits: 2 })
 }
 

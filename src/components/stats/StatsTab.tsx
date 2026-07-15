@@ -31,7 +31,7 @@ export function StatsTab() {
         <MetricCard
           label="% of supply staked"
           value={`${s.percentSupplyStaked}%`}
-          hint={`TVL $${(s.tvlUsd / 1e6).toFixed(1)}M (escalation stakes plus query tokens)`}
+          hint={`TVL $${(s.tvlUsd / 1e6).toFixed(1)}M (escalation stakes + query tokens)`}
         />
         <MetricCard
           label="Estimated open interest"
