@@ -27,6 +27,22 @@ body {
   min-height: 100vh;
 }
 
+/* Dark mode: invert-style like Chrome dark mode extensions (Dark Reader filter mode).
+   Applied to the app wrapper (and the fixed toast on its own element so its
+   viewport positioning is unaffected). Images are re-inverted to stay natural. */
+html.dark,
+html.dark body {
+  background: #0a0a0a;
+}
+
+.dark-invert {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+.dark-invert img {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 /* Report tab hero — soft slate, not white / not near-black */
 .report-hero {
   background-color: #c5ced9 !important;

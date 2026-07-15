@@ -69,7 +69,7 @@ export function StakeTimeline({ query }: StakeTimelineProps) {
       ) : (
         <ol className="relative space-y-0 border-l border-gray-200 pl-4">
           {sorted.map((s) => (
-            <li key={s.id} className="relative pb-4 last:pb-0">
+            <li key={s.id} className="relative pb-2 last:pb-0">
               <span className="absolute -left-[1.3rem] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-gray-400 ring-1 ring-gray-200" />
               <div className="flex items-start justify-between gap-2">
                 <div>

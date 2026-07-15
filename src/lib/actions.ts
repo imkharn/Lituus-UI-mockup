@@ -11,7 +11,7 @@ export interface AppState {
 export type AppAction =
   | { type: 'STAKE'; queryId: number; outcomeIndex: number; amount: number }
   | { type: 'CLAIM'; queryId: number }
-  | { type: 'MIGRATE'; queryId: number; childOutcome: number }
+  | { type: 'MIGRATE'; queryId: number; childLabel: string; amount: number }
   | { type: 'TICK'; ms: number }
   | { type: 'CLEAR_TOAST' }
   | {
@@ -65,7 +65,8 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case 'MIGRATE': {
       const q = state.queries.find((x) => x.id === action.queryId)
       if (!q?.forkInfo) return state
-      const amount = q.forkInfo.migrateAmount
+      const amount = action.amount
+      if (amount <= 0) return state
       if (state.wallet.repBalance < amount) {
         return { ...state, toast: 'Insufficient REP to migrate' }
       }
@@ -86,7 +87,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
               }
             : x,
         ),
-        toast: `Migrated ${formatRep(amount)} REP to ${q.outcomes[action.childOutcome] ?? 'child universe'}`,
+        toast: `Migrated ${formatRep(amount)} REP to ${action.childLabel}`,
       }
     }
 
@@ -161,7 +162,8 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case 'CREATE_QUERY': {
       const id = nextId(state.queries)
       const fee = action.fee
-      if (state.wallet.repBalance < fee) {
+      const totalCost = fee + (action.tip ?? 0)
+      if (state.wallet.repBalance < totalCost) {
         return { ...state, toast: 'Insufficient REP for query fee' }
       }
       const newQuery: MockQuery = {
@@ -188,10 +190,10 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         ...state,
         wallet: {
           ...state.wallet,
-          repBalance: state.wallet.repBalance - fee,
+          repBalance: state.wallet.repBalance - totalCost,
         },
         queries: [newQuery, ...state.queries],
-        toast: `Created query #${id} for ${formatRep(fee)} REP`,
+        toast: `Created query #${id} for ${formatRep(totalCost)} REP`,
       }
     }
 

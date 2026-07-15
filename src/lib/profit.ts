@@ -50,6 +50,16 @@ export function smartSortScore(query: MockQuery): number {
   return estimatedProfit(query) / (minutesRemaining + 5)
 }
 
+export interface ToWinBreakdown {
+  /** Bet returned plus proportional share of 80% of losing stakes. */
+  bond: number
+  tip: number
+  reporterPay: number
+  total: number
+}
+
+const round2 = (n: number) => Math.round(n * 100) / 100
+
 /**
  * Escalation payout for a prospective stake, in REP.
  * Winners get their bond back plus 80% of losing stakes split proportionally
@@ -57,12 +67,12 @@ export function smartSortScore(query: MockQuery): number {
  * first correct reporter, so they are included only when no one has staked on
  * the selected outcome yet.
  */
-export function estimateToWin(
+export function toWinBreakdown(
   bet: number,
   query: MockQuery,
   outcomeIndex: number,
-): number {
-  if (bet <= 0) return 0
+): ToWinBreakdown {
+  if (bet <= 0) return { bond: 0, tip: 0, reporterPay: 0, total: 0 }
   const total = query.totalStakedByOutcome.reduce((a, b) => a + b, 0)
   const onOutcome = query.totalStakedByOutcome[outcomeIndex] ?? 0
   const losing = total - onOutcome
@@ -70,8 +80,18 @@ export function estimateToWin(
   const firstOnOutcome = !query.stakes.some(
     (s) => s.outcomeIndex === outcomeIndex,
   )
-  const bonus = firstOnOutcome
-    ? reporterPayAt(query, Date.now()) + (query.tip ?? 0)
-    : 0
-  return Math.round((bet + share + bonus) * 100) / 100
+  const bond = round2(bet + share)
+  const tip = round2(firstOnOutcome ? (query.tip ?? 0) : 0)
+  const reporterPay = round2(
+    firstOnOutcome ? reporterPayAt(query, Date.now()) : 0,
+  )
+  return { bond, tip, reporterPay, total: round2(bond + tip + reporterPay) }
+}
+
+export function estimateToWin(
+  bet: number,
+  query: MockQuery,
+  outcomeIndex: number,
+): number {
+  return toWinBreakdown(bet, query, outcomeIndex).total
 }

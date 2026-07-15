@@ -35,9 +35,12 @@ export function useQueries() {
     dispatch({ type: 'CLAIM', queryId })
   }, [])
 
-  const migrate = useCallback((queryId: number, childOutcome: number) => {
-    dispatch({ type: 'MIGRATE', queryId, childOutcome })
-  }, [])
+  const migrate = useCallback(
+    (queryId: number, childLabel: string, amount: number) => {
+      dispatch({ type: 'MIGRATE', queryId, childLabel, amount })
+    },
+    [],
+  )
 
   const createQuery = useCallback(
     (question: string, outcomes: string[], fee: number, tip?: number) => {

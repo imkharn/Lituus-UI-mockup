@@ -7,7 +7,7 @@ interface ReportTabProps {
   walletBalance: number
   onStake: (queryId: number, outcomeIndex: number, amount: number) => void
   onClaim: (queryId: number) => void
-  onMigrate: (queryId: number, childOutcome: number) => void
+  onMigrate: (queryId: number, childLabel: string, amount: number) => void
 }
 
 export function ReportTab({
@@ -24,7 +24,7 @@ export function ReportTab({
   return (
     <div>
       <div className="report-hero">
-        <div className="px-4 py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-3 sm:px-6 lg:px-8">
           <h2 className="report-hero__title text-xl font-semibold tracking-tight sm:text-2xl">
             Stake, report &amp; earn{' '}
             <span className="report-hero__accent">

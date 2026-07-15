@@ -7,7 +7,7 @@ interface QueryExpandedProps {
   walletBalance: number
   onStake: (outcomeIndex: number, amount: number) => void
   onClaim: () => void
-  onMigrate: (childOutcome: number) => void
+  onMigrate: (childLabel: string, amount: number) => void
 }
 
 export function QueryExpanded({
@@ -18,7 +18,7 @@ export function QueryExpanded({
   onMigrate,
 }: QueryExpandedProps) {
   return (
-    <div className="border-t border-border bg-white px-4 py-5 sm:px-6">
+    <div className="border-t border-border bg-white px-4 py-3 sm:px-6">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.6fr_1fr]">
         <div className="min-w-0">
           <StakeForm

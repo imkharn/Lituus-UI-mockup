@@ -13,7 +13,7 @@ interface QueryRowProps {
   walletBalance: number
   onStake: (outcomeIndex: number, amount: number) => void
   onClaim: () => void
-  onMigrate: (childOutcome: number) => void
+  onMigrate: (childLabel: string, amount: number) => void
   badge?: string
 }
 
@@ -57,7 +57,7 @@ export function QueryRow({
       <button
         type="button"
         onClick={onToggle}
-        className="grid w-full grid-cols-[auto_1fr] items-center gap-3 px-4 py-4 text-left sm:px-6 lg:grid-cols-[auto_minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.9fr)]"
+        className="grid w-full grid-cols-[auto_1fr] items-center gap-3 px-4 py-2 text-left sm:px-6 lg:grid-cols-[auto_minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.9fr)]"
       >
         <span
           className={clsx(

@@ -9,14 +9,14 @@ interface QueryListProps {
   walletBalance: number
   onStake: (queryId: number, outcomeIndex: number, amount: number) => void
   onClaim: (queryId: number) => void
-  onMigrate: (queryId: number, childOutcome: number) => void
+  onMigrate: (queryId: number, childLabel: string, amount: number) => void
 }
 
 function requiredBadge(q: MockQuery): string | undefined {
   if (q.userHasLosingBond || q.category === 'required_appeal_urgent') {
     return 'Appeal required'
   }
-  if (q.forkInfo) return 'Migrate'
+  if (q.forkInfo) return 'Fork migration'
   return undefined
 }
 
@@ -42,7 +42,7 @@ export function QueryList({
 
   return (
     <div className="w-full">
-      <div className="flex flex-col gap-3 border-b border-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+      <div className="flex flex-col gap-3 border-b border-border px-4 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Reporting</h2>
           <p className="text-sm text-gray-500">
@@ -80,7 +80,7 @@ export function QueryList({
       </div>
 
       {/* Column headers */}
-      <div className="hidden border-b border-border bg-gray-50 px-4 py-2 text-xs font-medium uppercase tracking-wide text-gray-500 lg:grid lg:grid-cols-[auto_minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-3 lg:px-6 lg:pl-[3.25rem]">
+      <div className="hidden border-b border-border bg-gray-50 px-4 py-1 text-xs font-medium uppercase tracking-wide text-gray-500 lg:grid lg:grid-cols-[auto_minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-3 lg:px-6 lg:pl-[3.25rem]">
         <span />
         <span>Title</span>
         <span>Outcome</span>
@@ -95,7 +95,7 @@ export function QueryList({
       ) : (
         sections.map((section) => (
           <div key={`${section.tier}-${section.label}`}>
-            <div className="flex items-center justify-between border-b border-border bg-gray-50/80 px-4 py-2 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between border-b border-border bg-gray-50/80 px-4 py-1 sm:px-6 lg:px-8">
               <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                 {section.label}
               </h3>
@@ -122,7 +122,9 @@ export function QueryList({
                 walletBalance={walletBalance}
                 onStake={(outcome, amount) => onStake(q.id, outcome, amount)}
                 onClaim={() => onClaim(q.id)}
-                onMigrate={(child) => onMigrate(q.id, child)}
+                onMigrate={(childLabel, amount) =>
+                  onMigrate(q.id, childLabel, amount)
+                }
                 badge={
                   section.tier === 'required' ? requiredBadge(q) : undefined
                 }

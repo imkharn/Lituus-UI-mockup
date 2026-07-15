@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+import { mockStats } from '../../data/mockQueries'
 import { formatRep } from '../../lib/actions'
 
 interface QueryHelpProps {
@@ -72,13 +73,15 @@ export function QueryHelp({
           <section>
             <h4 className="font-semibold text-gray-900">Attack cost</h4>
             <p className="mt-1">
-              An attacker must stake roughly{' '}
+              An attacker must spend roughly{' '}
               <strong className="text-gray-900">
                 ${formatRep(attackCost)}
               </strong>{' '}
-              (the fork bond, ~2% of REP supply) to force an incorrect
-              resolution through a fork. Anything less can be appealed by honest
-              reporters who profit from correcting it.
+              to force an incorrect resolution. This is the attack cost: the
+              REP fully diluted valuation ($
+              {formatRep(mockStats.repFdvUsd)}) times the{' '}
+              {mockStats.securityMargin}× security margin. Anything less can be
+              appealed by honest reporters who profit from correcting it.
             </p>
           </section>
 
