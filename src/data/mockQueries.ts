@@ -84,19 +84,6 @@ const e1 = escalation(
   23.93, // ~4 min left in the 24h appeal window
 )
 
-/** Second bond-at-risk: user reported, then got appealed — must restake soon. */
-const e1b = escalation(
-  '1b',
-  FEE,
-  3,
-  [
-    { owner: USER, outcome: 0, isUser: true },
-    { owner: R2, outcome: 1 },
-  ],
-  [8.6],
-  23.7, // ~18 min left
-)
-
 const e2 = escalation(
   '2',
   FEE,
@@ -231,28 +218,6 @@ export const initialQueries: MockQuery[] = [
     claimableAmount: 0,
     userHasLosingBond: true,
     hasOpenAppeal: true,
-  },
-  {
-    id: 23,
-    question: 'Will the SEC approve a spot Solana ETF this year? [0=false,1=true]',
-    description:
-      'This market resolves Yes if the U.S. Securities and Exchange Commission approves at least one spot Solana exchange-traded fund for trading before December 31, 2025, 11:59 PM ET. The resolution source is the official SEC EDGAR filing record. Futures-based products and applications that are merely acknowledged (but not approved) do not count. Otherwise this market resolves No.',
-    outcomes: ['No', 'Yes', 'Invalid'],
-    fee: FEE,
-    createdAt: e1b.stakes[0].timestamp - 14 * HOUR,
-    appealBond: e1b.nextBond,
-    tentativeOutcome: 1,
-    finalOutcome: null,
-    totalStakedByOutcome: e1b.totals,
-    stakes: e1b.stakes,
-    timeRemainingMs: 18 * MIN,
-    columnMode: 'activeAppeal',
-    category: 'required_appeal_urgent',
-    isResolved: false,
-    claimableAmount: 0,
-    userHasLosingBond: true,
-    hasOpenAppeal: true,
-    tip: 2,
   },
   {
     id: 2,

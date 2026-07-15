@@ -45,8 +45,15 @@ export function QueryRow({
       ? 'Reporting bond'
       : 'Appeal bond'
 
-  const outcomeHeader =
-    query.columnMode === 'preAppeal' ? 'Resolves to' : 'Tentative outcome'
+  const outcomeHeader = query.isResolved
+    ? 'Final Outcome'
+    : query.columnMode === 'preAppeal'
+      ? 'Resolves to'
+      : 'Tentative outcome'
+
+  const timeLabel = query.isResolved
+    ? '–'
+    : formatTimeRemaining(query.timeRemainingMs)
 
   const profit = availableProfit(query, walletBalance)
   const profitLabel =
@@ -96,7 +103,7 @@ export function QueryRow({
               {bondHeader}: {bondLabel}
             </span>
             <span>Available profit: {profitLabel}</span>
-            <span>{formatTimeRemaining(query.timeRemainingMs)}</span>
+            <span>{timeLabel}</span>
           </div>
         </div>
         <div className="hidden min-w-0 lg:block">
@@ -115,12 +122,12 @@ export function QueryRow({
           <p
             className={clsx(
               'text-sm font-medium',
-              query.timeRemainingMs < 30 * 60_000
+              !query.isResolved && query.timeRemainingMs < 30 * 60_000
                 ? 'text-red-600'
                 : 'text-gray-900',
             )}
           >
-            {formatTimeRemaining(query.timeRemainingMs)}
+            {timeLabel}
           </p>
         </div>
       </button>

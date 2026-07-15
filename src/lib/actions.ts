@@ -209,12 +209,18 @@ export function formatUsd(n: number): string {
 }
 
 export function formatRep(n: number): string {
-  // REP amounts under 100 are shown as whole numbers; larger amounts keep up to
-  // two decimals.
-  if (Math.abs(n) < 100) {
-    return Math.round(n).toLocaleString()
-  }
-  return n.toLocaleString(undefined, { maximumFractionDigits: 2 })
+  // Precision scales with magnitude: >100 whole, 10–100 one decimal,
+  // 1–10 two decimals, <1 three decimals.
+  const abs = Math.abs(n)
+  let digits: number
+  if (abs >= 100) digits = 0
+  else if (abs >= 10) digits = 1
+  else if (abs >= 1) digits = 2
+  else digits = 3
+  return n.toLocaleString(undefined, {
+    maximumFractionDigits: digits,
+    minimumFractionDigits: 0,
+  })
 }
 
 export function truncateAddress(addr: string): string {
