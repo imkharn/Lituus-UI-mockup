@@ -45,6 +45,19 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
     return [...parts, 'Invalid']
   }, [outcomeMode, outcomeLabels])
 
+  const outcomePreview =
+    outcomeMode === 'binary'
+      ? outcomes.join(' · ')
+      : outcomes
+          .map((o, i) => {
+            const hex =
+              i === outcomes.length - 1
+                ? 'FF'
+                : i.toString(16).padStart(2, '0').toUpperCase()
+            return `outcome ${hex} = ${o}`
+          })
+          .join(', ')
+
   const oiExceedsAttack =
     mockStats.estimatedOpenInterest != null &&
     mockStats.estimatedOpenInterest > mockStats.attackCostUsd
@@ -62,8 +75,11 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
         ? ' [0=false,1=true]'
         : ` [${outcomes
             .slice(0, -1)
-            .map((o, i) => `${i}=${o}`)
-            .join(',')}]`
+            .map(
+              (o, i) =>
+                `${i.toString(16).padStart(2, '0').toUpperCase()}=${o}`,
+            )
+            .join(',')},FF=Invalid]`
 
     onCreate(question.trim() + suffix, outcomes, feeRep, tip)
     setSubmitted(true)
@@ -166,7 +182,7 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
               />
             )}
             <p className="mt-1.5 text-xs text-gray-500">
-              Outcomes: {outcomes.join(' · ')}
+              Outcomes: {outcomePreview}
             </p>
           </div>
 

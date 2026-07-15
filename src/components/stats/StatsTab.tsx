@@ -22,7 +22,7 @@ export function StatsTab() {
         from Dune in production.
       </p>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <MetricCard
           label="Average reporter APY"
           value={`${s.averageReporterApy}%`}
@@ -31,7 +31,7 @@ export function StatsTab() {
         <MetricCard
           label="% of supply staked"
           value={`${s.percentSupplyStaked}%`}
-          hint={`TVL $${(s.tvlUsd / 1e6).toFixed(1)}M (escalation + QT)`}
+          hint={`TVL $${(s.tvlUsd / 1e6).toFixed(1)}M (escalation stakes plus query tokens)`}
         />
         <MetricCard
           label="Estimated open interest"
@@ -42,6 +42,11 @@ export function StatsTab() {
           label="Estimated attack cost"
           value={`$${(s.attackCostUsd / 1e6).toFixed(1)}M`}
           hint={`$${(s.repFdvUsd / 1e6).toFixed(1)}M REP FDV × ${s.securityMargin} = $${(s.attackCostUsd / 1e6).toFixed(1)}M`}
+        />
+        <MetricCard
+          label="Average burn rate"
+          value={`$${(s.averageBurnUsdPerYear / 1e6).toFixed(2)}M / yr`}
+          hint={`${((s.averageBurnUsdPerYear / s.repFdvUsd) * 100).toFixed(1)}% of supply burned per year on average since launch`}
         />
       </div>
 

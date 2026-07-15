@@ -63,9 +63,14 @@ const round2 = (n: number) => Math.round(n * 100) / 100
 /**
  * Escalation payout for a prospective stake, in REP.
  * Winners get their bond back plus 80% of losing stakes split proportionally
- * (20% of losing stakes are burned). The reporter pay and tip go only to the
- * first correct reporter, so they are included only when no one has staked on
- * the selected outcome yet.
+ * (20% of losing stakes are burned).
+ *
+ * The UI assumes the customer is always right: tip and reporter pay go to the
+ * first correct reporter, so they are included whenever this stake would be
+ * the first on the selected outcome. Tip is 0 when the query has no tip.
+ * Reporter pay is locked at the time of the first report on the query (linear
+ * over the 3-day first-report window); before any report it accrues to now.
+ * Both are 0 when staking on an outcome that already has stake.
  */
 export function toWinBreakdown(
   bet: number,
@@ -82,9 +87,7 @@ export function toWinBreakdown(
   )
   const bond = round2(bet + share)
   const tip = round2(firstOnOutcome ? (query.tip ?? 0) : 0)
-  const reporterPay = round2(
-    firstOnOutcome ? reporterPayAt(query, Date.now()) : 0,
-  )
+  const reporterPay = round2(firstOnOutcome ? currentReporterPay(query) : 0)
   return { bond, tip, reporterPay, total: round2(bond + tip + reporterPay) }
 }
 

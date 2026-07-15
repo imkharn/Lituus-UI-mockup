@@ -90,6 +90,8 @@ export interface MockStats {
   protocolFeeUsd: number
   ammPriceUsd: number
   repPriceUsd: number
+  /** Average annual burn in USD since launch (≈ FDV / 40). */
+  averageBurnUsdPerYear: number
   chartSeries: ChartPoint[]
   feeProjectionDirection: 'up' | 'down'
 }
