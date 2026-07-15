@@ -79,7 +79,34 @@ const e1 = escalation(
     { owner: R1, outcome: 0 },
   ],
   [14.2],
-  0.07,
+  23.93, // ~4 min left in the 24h appeal window
+)
+
+/** Second bond-at-risk: user reported, then got appealed — must restake soon. */
+const e1b = escalation(
+  '1b',
+  4,
+  3,
+  [
+    { owner: USER, outcome: 0, isUser: true },
+    { owner: R2, outcome: 1 },
+  ],
+  [8.6],
+  23.7, // ~18 min left
+)
+
+/** Third bond-at-risk: user lost the latest round and must appeal. */
+const e1c = escalation(
+  '1c',
+  3,
+  3,
+  [
+    { owner: R1, outcome: 1 },
+    { owner: USER, outcome: 0, isUser: true },
+    { owner: R3, outcome: 1 },
+  ],
+  [19.4, 11.2],
+  23.25, // ~45 min left
 )
 
 const e2 = escalation(
@@ -215,6 +242,45 @@ export const initialQueries: MockQuery[] = [
     totalStakedByOutcome: e1.totals,
     stakes: e1.stakes,
     timeRemainingMs: 4 * MIN,
+    columnMode: 'activeAppeal',
+    category: 'required_appeal_urgent',
+    isResolved: false,
+    claimableAmount: 0,
+    userHasLosingBond: true,
+    hasOpenAppeal: true,
+  },
+  {
+    id: 23,
+    question: 'Will the SEC approve a Solana ETF this year? [0=false,1=true]',
+    outcomes: ['No', 'Yes', 'Invalid'],
+    fee: 4,
+    createdAt: e1b.stakes[0].timestamp - 20 * HOUR,
+    appealBond: e1b.nextBond,
+    tentativeOutcome: 1,
+    finalOutcome: null,
+    totalStakedByOutcome: e1b.totals,
+    stakes: e1b.stakes,
+    timeRemainingMs: 18 * MIN,
+    columnMode: 'activeAppeal',
+    category: 'required_appeal_urgent',
+    isResolved: false,
+    claimableAmount: 0,
+    userHasLosingBond: true,
+    hasOpenAppeal: true,
+    tip: 2,
+  },
+  {
+    id: 24,
+    question: 'Will crude oil close above $90 this month? [0=false,1=true]',
+    outcomes: ['No', 'Yes', 'Invalid'],
+    fee: 3,
+    createdAt: e1c.stakes[0].timestamp - 30 * HOUR,
+    appealBond: e1c.nextBond,
+    tentativeOutcome: 1,
+    finalOutcome: null,
+    totalStakedByOutcome: e1c.totals,
+    stakes: e1c.stakes,
+    timeRemainingMs: 45 * MIN,
     columnMode: 'activeAppeal',
     category: 'required_appeal_urgent',
     isResolved: false,

@@ -42,9 +42,7 @@ export function QueryRow({
     ? 'Bond'
     : query.stakes.length === 0
       ? 'Reporting bond'
-      : query.columnMode === 'preAppeal'
-        ? 'Unless appeal bond'
-        : 'Appeal bond'
+      : 'Appeal bond'
 
   const outcomeHeader =
     query.columnMode === 'preAppeal' ? 'Resolves to' : 'Tentative outcome'
