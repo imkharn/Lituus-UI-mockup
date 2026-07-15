@@ -31,8 +31,12 @@ export function StakeForm({
   const [outcomeIndex, setOutcomeIndex] = useState(
     defaultOutcome >= 0 ? defaultOutcome : 0,
   )
-  const [bet, setBet] = useState<string>('')
-  const [touched, setTouched] = useState(false)
+  const requiredBond = query.appealBond || query.fee
+  const maxStake = Math.min(requiredBond, walletBalance)
+  // Prefill the bet with the max stake — nearly all reporters want to stake the
+  // full bond, so they shouldn't have to press MAX first.
+  const [bet, setBet] = useState<string>(String(maxStake))
+  const [touched, setTouched] = useState(true)
   const [childChoice, setChildChoice] = useState(0)
   const [migrateInput, setMigrateInput] = useState<string>('')
 
@@ -43,9 +47,6 @@ export function StakeForm({
     [betNum, query, outcomeIndex],
   )
   const toWin = breakdown.total
-
-  const requiredBond = query.appealBond || query.fee
-  const maxStake = Math.min(requiredBond, walletBalance)
 
   if (isClaim) {
     return (
