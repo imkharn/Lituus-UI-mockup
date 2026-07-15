@@ -1,5 +1,5 @@
 import type { MockQuery, MockWallet } from '../types/query'
-import { MOCK_USER_ADDRESS } from '../data/mockQueries'
+import { initialQueries, initialWallet, MOCK_USER_ADDRESS } from '../data/mockQueries'
 import { FORK_BOND_REP } from './profit'
 
 export interface AppState {
@@ -14,6 +14,9 @@ export type AppAction =
   | { type: 'MIGRATE'; queryId: number; childLabel: string; amount: number }
   | { type: 'TICK'; ms: number }
   | { type: 'CLEAR_TOAST' }
+  | { type: 'ADD_REP'; amount: number }
+  | { type: 'RESET' }
+  | { type: 'SKIP_TIME'; ms: number }
   | {
       type: 'CREATE_QUERY'
       question: string
@@ -30,6 +33,13 @@ export function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case 'CLEAR_TOAST':
       return { ...state, toast: null }
+
+    case 'RESET':
+      return {
+        queries: structuredClone(initialQueries),
+        wallet: { ...initialWallet },
+        toast: 'Reset to starting state',
+      }
 
     case 'TICK': {
       const queries = state.queries.map((q) =>
@@ -70,24 +80,41 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       if (state.wallet.repBalance < amount) {
         return { ...state, toast: 'Insufficient REP to migrate' }
       }
+      // Migration only deducts REP — the query stays in the list unchanged so
+      // the user can keep interacting with the fork UX.
       return {
         ...state,
         wallet: {
           ...state.wallet,
           repBalance: state.wallet.repBalance - amount,
         },
-        queries: state.queries.map((x) =>
-          x.id === action.queryId
-            ? {
-                ...x,
-                forkInfo: undefined,
-                category: 'appeal_window' as const,
-                timeRemainingMs: 0,
-                hidden: true,
-              }
-            : x,
-        ),
         toast: `Migrated ${formatRep(amount)} REP to ${action.childLabel}`,
+      }
+    }
+
+    case 'ADD_REP':
+      return {
+        ...state,
+        wallet: {
+          ...state.wallet,
+          repBalance: state.wallet.repBalance + action.amount,
+        },
+        toast: `Added ${formatRep(action.amount)} REP to wallet`,
+      }
+
+    case 'SKIP_TIME': {
+      const queries = state.queries.map((q) =>
+        q.isResolved
+          ? q
+          : {
+              ...q,
+              timeRemainingMs: Math.max(0, q.timeRemainingMs - action.ms),
+            },
+      )
+      return {
+        ...state,
+        queries,
+        toast: 'Skipped forward 2 hours',
       }
     }
 

@@ -122,18 +122,14 @@ export function estimateToWin(
 }
 
 /**
- * Max available profit if the user places the max bet on the best selectable
- * outcome: max(toWin − maxBet) across outcomes that are not the locked
- * tentative outcome. Returns null when profit is not applicable (resolved /
+ * Max available profit if the user places the full bond on the best selectable
+ * outcome: max(toWin − maxBet). Assumes unlimited REP (wallet balance does not
+ * cap the max bet). Returns null when profit is not applicable (resolved /
  * migrate / hidden).
  */
-export function availableProfit(
-  query: MockQuery,
-  walletBalance: number,
-): number | null {
+export function availableProfit(query: MockQuery): number | null {
   if (query.isResolved || query.forkInfo || query.hidden) return null
-  const required = query.appealBond || query.fee || PROTOCOL_FEE_REP
-  const maxBet = Math.min(required, walletBalance)
+  const maxBet = query.appealBond || query.fee || PROTOCOL_FEE_REP
   if (maxBet <= 0) return 0
 
   const locked =

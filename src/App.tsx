@@ -27,6 +27,9 @@ export default function App() {
     claim,
     migrate,
     createQuery,
+    addRep,
+    reset,
+    skipTime,
     clearToast,
   } = useQueries()
 
@@ -50,6 +53,9 @@ export default function App() {
           repBalance={wallet.repBalance}
           dark={dark}
           onToggleDark={() => setDark((d) => !d)}
+          onAddRep={addRep}
+          onReset={reset}
+          onSkipTime={skipTime}
         />
 
         <main>

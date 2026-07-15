@@ -55,7 +55,7 @@ export function QueryRow({
     ? '–'
     : formatTimeRemaining(query.timeRemainingMs)
 
-  const profit = availableProfit(query, walletBalance)
+  const profit = availableProfit(query)
   const profitLabel =
     profit == null ? '–' : `${formatRep(profit)} REP`
 

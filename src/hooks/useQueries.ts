@@ -2,6 +2,9 @@ import { useEffect, useReducer, useCallback } from 'react'
 import { initialQueries, initialWallet } from '../data/mockQueries'
 import { appReducer, type AppState } from '../lib/actions'
 
+const TWO_HOURS_MS = 2 * 60 * 60 * 1000
+const ADD_REP_AMOUNT = 10_000
+
 const initialState: AppState = {
   queries: initialQueries,
   wallet: initialWallet,
@@ -52,6 +55,18 @@ export function useQueries() {
     [],
   )
 
+  const addRep = useCallback(() => {
+    dispatch({ type: 'ADD_REP', amount: ADD_REP_AMOUNT })
+  }, [])
+
+  const reset = useCallback(() => {
+    dispatch({ type: 'RESET' })
+  }, [])
+
+  const skipTime = useCallback(() => {
+    dispatch({ type: 'SKIP_TIME', ms: TWO_HOURS_MS })
+  }, [])
+
   return {
     queries: state.queries,
     wallet: state.wallet,
@@ -60,6 +75,9 @@ export function useQueries() {
     claim,
     migrate,
     createQuery,
+    addRep,
+    reset,
+    skipTime,
     clearToast: () => dispatch({ type: 'CLEAR_TOAST' }),
   }
 }
