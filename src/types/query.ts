@@ -44,6 +44,8 @@ export interface ForkInfo {
 export interface MockQuery {
   id: number
   question: string
+  /** Fleshed-out resolution criteria shown in the expanded view (Polymarket-style). */
+  description?: string
   outcomes: string[]
   fee: number
   createdAt: number

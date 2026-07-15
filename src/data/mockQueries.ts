@@ -234,7 +234,9 @@ const e22 = escalation('22', FEE, 3, [{ owner: R2, outcome: 1 }], [], 300)
 export const initialQueries: MockQuery[] = [
   {
     id: 1,
-    question: 'Will ETH ETF approval happen by Q3? [0=false,1=true]',
+    question: 'Will a spot Ethereum ETF be approved by Q3? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the U.S. Securities and Exchange Commission grants final approval for at least one spot Ethereum exchange-traded fund to begin trading on or before September 30, 2025, 11:59 PM ET. Approval of a futures-based ETF does not count. The resolution source is the official SEC filing record (sec.gov). If no spot ETH ETF is approved by the deadline, this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: e1.stakes[0].timestamp - 7 * HOUR,
@@ -253,7 +255,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 23,
-    question: 'Will the SEC approve a Solana ETF this year? [0=false,1=true]',
+    question: 'Will the SEC approve a spot Solana ETF this year? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the U.S. Securities and Exchange Commission approves at least one spot Solana exchange-traded fund for trading before December 31, 2025, 11:59 PM ET. The resolution source is the official SEC EDGAR filing record. Futures-based products and applications that are merely acknowledged (but not approved) do not count. Otherwise this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: e1b.stakes[0].timestamp - 14 * HOUR,
@@ -274,6 +278,8 @@ export const initialQueries: MockQuery[] = [
   {
     id: 24,
     question: 'Will crude oil close above $90 this month? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the front-month WTI crude oil futures contract (CL1) settles at or above $90.00 per barrel on any trading day during the current calendar month, per the official NYMEX settlement price published by CME Group. Intraday spikes that do not hold into the settlement price do not count. Otherwise this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: e1c.stakes[0].timestamp - 3 * HOUR,
@@ -292,12 +298,14 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 2,
-    question: 'Which outcome won the 2024 election fork? [0=A,1=B,2=C]',
-    outcomes: ['Candidate A', 'Candidate B', 'Candidate C', 'Invalid'],
+    question: 'Who will win the 2024 US presidential election? [0=Trump,1=Harris,2=Other]',
+    description:
+      'This market resolves to the winner of the 2024 United States presidential election. The winning candidate is the one who receives a majority of votes in the Electoral College, as certified by the U.S. Congress on January 6, 2025. "Other" covers any candidate besides Donald Trump or Kamala Harris. If the election is not certified by the resolution deadline, or the result is genuinely undetermined, this market resolves Invalid.',
+    outcomes: ['Trump', 'Harris', 'Other', 'Invalid'],
     fee: FEE,
     createdAt: e2.stakes[0].timestamp - 19 * HOUR,
     appealBond: e2.lastBond,
-    tentativeOutcome: 1,
+    tentativeOutcome: 0,
     finalOutcome: null,
     totalStakedByOutcome: e2.totals,
     stakes: e2.stakes,
@@ -311,18 +319,20 @@ export const initialQueries: MockQuery[] = [
     forkInfo: {
       forkState: 2,
       childUniverses: [
-        { outcomeIndex: 0, label: 'Candidate A' },
-        { outcomeIndex: 1, label: 'Candidate B' },
-        { outcomeIndex: 2, label: 'Candidate C' },
+        { outcomeIndex: 0, label: 'Trump' },
+        { outcomeIndex: 1, label: 'Harris' },
+        { outcomeIndex: 2, label: 'Other' },
         { outcomeIndex: 3, label: 'Invalid' },
       ],
       migrateAmount: 2500,
-      selectedChild: 1,
+      selectedChild: 0,
     },
   },
   {
     id: 3,
-    question: 'Did BTC exceed $100k in 2025? [0=false,1=true]',
+    question: 'Did Bitcoin exceed $100,000 in 2025? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the price of Bitcoin (BTC/USD) traded at or above $100,000 at any point during the 2025 calendar year, according to the Coinbase Pro BTC-USD spot price. A single confirmed print at or above the threshold is sufficient. This market has resolved Yes.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: e3.stakes[0].timestamp - 11 * HOUR,
@@ -341,7 +351,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 4,
-    question: 'Will Fed cut rates in March? [0=false,1=true]',
+    question: 'Will the Fed cut rates at the March FOMC meeting? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the U.S. Federal Reserve lowers its target range for the federal funds rate at the March Federal Open Market Committee meeting, as stated in the official FOMC policy statement. A hold or a hike resolves No. An unscheduled emergency cut before the meeting does not count toward this market.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: NOW - 30 * HOUR,
@@ -361,7 +373,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 5,
-    question: 'Will SpaceX land Starship successfully this year? [0=false,1=true]',
+    question: 'Will SpaceX successfully land Starship this year? [0=false,1=true]',
+    description:
+      'This market resolves Yes if SpaceX completes a controlled soft landing of a Starship upper stage (either on a landing pad or via an ocean/tower catch that SpaceX officially declares a success) during the current calendar year. The resolution source is official SpaceX communications and live webcast confirmation. A booster-only catch does not satisfy this market. Otherwise it resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: e5.stakes[0].timestamp - 22 * HOUR,
@@ -381,7 +395,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 6,
-    question: 'Will UK rejoin EU by 2030? [0=false,1=true]',
+    question: 'Will the UK rejoin the European Union by 2030? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the United Kingdom becomes a full member state of the European Union on or before December 31, 2030, as confirmed by the official EU membership register. A formal accession treaty entering into force is required; associate membership, single-market access, or a signed-but-not-ratified agreement does not count. Otherwise this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: e6.stakes[0].timestamp - 5 * HOUR,
@@ -400,7 +416,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 7,
-    question: 'Will global temps rise >1.5°C by 2030? [0=false,1=true]',
+    question: 'Will global average temperature exceed +1.5°C by 2030? [0=false,1=true]',
+    description:
+      'This market resolves Yes if any single calendar year on or before 2030 records a global mean surface temperature at least 1.5°C above the pre-industrial (1850–1900) baseline, according to the primary dataset published by NASA GISS or the Copernicus Climate Change Service. A single qualifying year is sufficient. Otherwise this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: e7.stakes[0].timestamp - 16 * HOUR,
@@ -419,7 +437,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 8,
-    question: 'Will OpenAI release AGI in 2026? [0=false,1=true]',
+    question: 'Will OpenAI publicly release a system it calls AGI in 2026? [0=false,1=true]',
+    description:
+      'This market resolves Yes if, during the 2026 calendar year, OpenAI publicly releases or announces general availability of a system that OpenAI itself officially designates as "AGI" (artificial general intelligence) in a formal announcement or product page. Informal remarks, research previews, or third-party characterizations do not count. Because "AGI" is contested and may be ambiguous, reporters should resolve Invalid if no clear official designation exists. Otherwise it resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: e8.stakes[0].timestamp - 8 * HOUR,
@@ -438,7 +458,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 9,
-    question: 'Will Ethereum average under 5 gwei this month? [0=false,1=true]',
+    question: 'Will Ethereum base fees average under 5 gwei this month? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the mean Ethereum base fee across all blocks in the current calendar month is below 5 gwei, computed from on-chain data via Etherscan\'s gas tracker daily averages. The average is weighted equally per block. Otherwise this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: NOW - 10 * HOUR,
@@ -459,6 +481,8 @@ export const initialQueries: MockQuery[] = [
   {
     id: 10,
     question: 'Will Apple release AR glasses this year? [0=false,1=true]',
+    description:
+      'This market resolves Yes if Apple begins retail sales of a dedicated augmented-reality glasses product (a lightweight worn-on-the-face eyewear device, distinct from the Vision Pro headset) to consumers during the current calendar year, per official Apple newsroom announcements and store availability. A pre-order or announcement without units shipping to customers does not count. Otherwise this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: NOW - 66 * HOUR,
@@ -478,7 +502,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 11,
-    question: 'Will Tesla hit 3M deliveries this year? [0=false,1=true]',
+    question: 'Will Tesla deliver 3 million vehicles this year? [0=false,1=true]',
+    description:
+      'This market resolves Yes if Tesla, Inc. reports total global vehicle deliveries of 3,000,000 or more for the current calendar year, as stated in Tesla\'s official quarterly and annual delivery/production reports. Production figures do not count — only deliveries. Otherwise this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: NOW - 68 * HOUR,
@@ -497,7 +523,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 12,
-    question: 'Will UEFA expand to 36 teams? [0=false,1=true]',
+    question: 'Will the UEFA Champions League run with 36 teams this season? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the UEFA Champions League group/league phase for the current season features 36 clubs under the "Swiss model" format, as confirmed by the official competition regulations published by UEFA. Otherwise this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: NOW - 63 * HOUR,
@@ -517,7 +545,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 13,
-    question: 'Will Japan raise rates this quarter? [0=false,1=true]',
+    question: 'Will the Bank of Japan raise its policy rate this quarter? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the Bank of Japan increases its short-term policy interest rate at any monetary policy meeting held during the current calendar quarter, per the official BOJ statement on monetary policy. A hold or a cut resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: e13.stakes[0].timestamp - 2 * HOUR,
@@ -537,7 +567,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 14,
-    question: 'Will Nvidia top $4T market cap? [0=false,1=true]',
+    question: 'Will Nvidia reach a $4 trillion market cap? [0=false,1=true]',
+    description:
+      'This market resolves Yes if Nvidia Corporation (NVDA) reaches an intraday or closing market capitalization of $4,000,000,000,000 or more, based on shares outstanding from its latest SEC filing multiplied by the NASDAQ share price. A single confirmed print at or above the threshold is sufficient. Otherwise this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: e14.stakes[0].timestamp - 18 * HOUR,
@@ -556,7 +588,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 15,
-    question: 'Will WHO declare a new pandemic this year? [0=false,1=true]',
+    question: 'Will the WHO declare a new pandemic this year? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the World Health Organization formally characterizes a new disease outbreak as a pandemic, or declares a new Public Health Emergency of International Concern (PHEIC) for a novel pathogen, during the current calendar year, per official WHO announcements. Continuations of previously declared emergencies do not count. Otherwise this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: NOW - 36 * HOUR,
@@ -576,7 +610,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 16,
-    question: 'Will EU pass AI Act amendment this year? [0=false,1=true]',
+    question: 'Will the EU adopt an AI Act amendment this year? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the European Union formally adopts an amendment to the AI Act (Regulation (EU) 2024/1689) that is published in the Official Journal of the European Union during the current calendar year. Proposals, draft texts, or trilogue agreements that are not yet published as adopted law do not count. Otherwise this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: NOW - 14 * HOUR,
@@ -595,7 +631,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 17,
-    question: 'Will Solana flip ETH daily tx count this month? [0=false,1=true]',
+    question: 'Will Solana surpass Ethereum in daily transactions this month? [0=false,1=true]',
+    description:
+      'This market resolves Yes if, on any single day during the current calendar month, the Solana network processes more successful non-vote transactions than the Ethereum mainnet processes transactions, per the daily figures reported by a recognized on-chain analytics provider (e.g., Artemis or Dune). Otherwise this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: NOW - 2 * HOUR,
@@ -615,7 +653,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 18,
-    question: 'Who wins 2028 US election? [0=Democrat,1=Republican,2=Independent]',
+    question: 'Which party wins the 2028 US presidential election? [0=Democrat,1=Republican,2=Independent]',
+    description:
+      'This market resolves to the party of the candidate who wins the 2028 United States presidential election, determined by a majority of Electoral College votes as certified by the U.S. Congress in January 2029. "Independent" covers any winner not nominated by the Democratic or Republican parties. If the result is not certified by the resolution deadline, this market resolves Invalid.',
     outcomes: ['Democrat', 'Republican', 'Independent', 'Invalid'],
     fee: FEE,
     createdAt: NOW - 60 * HOUR,
@@ -635,7 +675,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 19,
-    question: 'Will Argentina dollarize by 2027? [0=false,1=true]',
+    question: 'Will Argentina officially dollarize by 2027? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the Republic of Argentina formally adopts the U.S. dollar as its official legal tender, replacing the peso, through legislation or executive decree that takes effect on or before December 31, 2027, per official Argentine government publications. A currency peg or partial dollarization short of full legal-tender replacement does not count. Otherwise this market resolves No.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: NOW - 64 * HOUR,
@@ -655,7 +697,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 20,
-    question: 'Did ETH merge succeed? [0=false,1=true]',
+    question: 'Did the Ethereum Merge complete successfully? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the Ethereum network successfully transitioned from proof-of-work to proof-of-stake consensus (the "Merge") without a persistent chain split that retained majority economic activity on proof-of-work. The resolution source is the Ethereum Foundation\'s official confirmation. This market has resolved Yes.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: e20.stakes[0].timestamp - 9 * HOUR,
@@ -674,7 +718,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 21,
-    question: 'Did the 2024 Olympics open on time? [0=false,1=true]',
+    question: 'Did the 2024 Paris Olympics opening ceremony occur on schedule? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the opening ceremony of the 2024 Summer Olympic Games in Paris took place on its officially scheduled date of July 26, 2024, per the International Olympic Committee. This market has resolved Yes.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: e21.stakes[0].timestamp - 21 * HOUR,
@@ -694,7 +740,9 @@ export const initialQueries: MockQuery[] = [
   },
   {
     id: 22,
-    question: 'Was Bitcoin halving in April 2024? [0=false,1=true]',
+    question: 'Did the Bitcoin halving occur in April 2024? [0=false,1=true]',
+    description:
+      'This market resolves Yes if the Bitcoin block subsidy halving (the reduction from 6.25 to 3.125 BTC per block at block height 840,000) occurred during April 2024, per on-chain block timestamps. This market has resolved Yes.',
     outcomes: ['No', 'Yes', 'Invalid'],
     fee: FEE,
     createdAt: e22.stakes[0].timestamp - 4 * HOUR,

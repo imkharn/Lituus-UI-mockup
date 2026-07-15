@@ -82,11 +82,6 @@ export function QueryRow({
                 {badge}
               </span>
             )}
-            {query.tip != null && query.tip > 0 && (
-              <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-900">
-                +{formatRep(query.tip)} REP tip
-              </span>
-            )}
             {query.isResolved && query.claimableAmount > 0 && (
               <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-900">
                 Claim {formatRep(query.claimableAmount)}

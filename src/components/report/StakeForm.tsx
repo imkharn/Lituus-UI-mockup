@@ -305,6 +305,9 @@ function InfoBlock({ query }: { query: MockQuery }) {
         <span className="font-medium text-gray-800">Query data:</span>{' '}
         {query.question}
       </p>
+      {query.description && (
+        <p className="leading-relaxed text-gray-500">{query.description}</p>
+      )}
       <p>
         Fee {formatRep(query.fee)} REP · Reporter pay ~{formatRep(pay)} REP
         {query.tip != null && query.tip > 0 && (
