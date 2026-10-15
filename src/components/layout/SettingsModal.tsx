@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { RepToken } from '../rep/RepToken'
 
 interface SettingsModalProps {
   open: boolean
@@ -66,7 +67,7 @@ export function SettingsModal({
             }}
             className="w-full rounded-lg border border-border bg-gray-50 px-4 py-2.5 text-left text-sm font-medium text-gray-900 hover:bg-gray-100"
           >
-            Add 10,000 REP
+            Add 10,000 <RepToken />
             <span className="mt-0.5 block text-xs font-normal text-gray-500">
               Credit your mock wallet
             </span>

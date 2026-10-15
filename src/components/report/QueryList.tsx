@@ -91,7 +91,9 @@ export function QueryList({
 
       {sections.length === 0 ? (
         <p className="px-4 py-12 text-center text-sm text-gray-500 sm:px-6">
-          No open queries right now.
+          {queries.length === 0
+            ? 'No open queries in this universe — forked universes resolve or refund all queries.'
+            : 'No open queries right now.'}
         </p>
       ) : (
         sections.map((section) => (

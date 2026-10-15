@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { mockStats } from '../../data/mockQueries'
 import { formatRep, formatUsd } from '../../lib/actions'
 import { BenefitBanner } from '../layout/BenefitBanner'
+import { RepToken } from '../rep/RepToken'
 import { QueryHelp } from './QueryHelp'
 
 interface QueryTabProps {
@@ -16,10 +17,11 @@ interface QueryTabProps {
 
 export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
   const [question, setQuestion] = useState('')
-  const [outcomeMode, setOutcomeMode] = useState<'binary' | 'categorical'>(
-    'binary',
-  )
+  const [outcomeMode, setOutcomeMode] = useState<
+    'binary' | 'categorical' | 'scalar'
+  >('binary')
   const [outcomeLabels, setOutcomeLabels] = useState('Apple, Banana, Carrot')
+  const [decimals, setDecimals] = useState('0')
   const [tipAmount, setTipAmount] = useState('')
   const [helpOpen, setHelpOpen] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -37,6 +39,7 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
 
   const outcomes = useMemo(() => {
     if (outcomeMode === 'binary') return ['No', 'Yes', 'Invalid']
+    if (outcomeMode === 'scalar') return ['Number', 'Invalid']
     const parts = outcomeLabels
       .split(',')
       .map((s) => s.trim())
@@ -48,15 +51,17 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
   const outcomePreview =
     outcomeMode === 'binary'
       ? outcomes.join(' · ')
-      : outcomes
-          .map((o, i) => {
-            const hex =
-              i === outcomes.length - 1
-                ? 'FF'
-                : i.toString(16).padStart(2, '0').toUpperCase()
-            return `outcome ${hex} = ${o}`
-          })
-          .join(', ')
+      : outcomeMode === 'scalar'
+        ? `scalar · decimals=${decimals || '0'} (value ÷ 10^${decimals || '0'})`
+        : outcomes
+            .map((o, i) => {
+              const hex =
+                i === outcomes.length - 1
+                  ? 'FF'
+                  : i.toString(16).padStart(2, '0').toUpperCase()
+              return `outcome ${hex} = ${o}`
+            })
+            .join(', ')
 
   const oiExceedsAttack =
     mockStats.estimatedOpenInterest != null &&
@@ -72,14 +77,16 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
 
     const suffix =
       outcomeMode === 'binary'
-        ? ' [0=false,1=true]'
-        : ` [${outcomes
-            .slice(0, -1)
-            .map(
-              (o, i) =>
-                `${i.toString(16).padStart(2, '0').toUpperCase()}=${o}`,
-            )
-            .join(',')},FF=Invalid]`
+        ? ' [00=No,01=Yes,FF=Invalid]'
+        : outcomeMode === 'scalar'
+          ? ` [scalar,decimals=${Number(decimals) || 0}]`
+          : ` [${outcomes
+              .slice(0, -1)
+              .map(
+                (o, i) =>
+                  `${i.toString(16).padStart(2, '0').toUpperCase()}=${o}`,
+              )
+              .join(',')},FF=Invalid]`
 
     onCreate(question.trim() + suffix, outcomes, feeRep, tip)
     setSubmitted(true)
@@ -171,6 +178,17 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
               >
                 Categorical
               </button>
+              <button
+                type="button"
+                onClick={() => setOutcomeMode('scalar')}
+                className={
+                  outcomeMode === 'scalar'
+                    ? 'rounded-md bg-gray-900 px-3 py-1.5 text-sm text-white'
+                    : 'rounded-md border border-border px-3 py-1.5 text-sm text-gray-700'
+                }
+              >
+                Scalar
+              </button>
             </div>
             {outcomeMode === 'categorical' && (
               <input
@@ -180,6 +198,20 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
                 placeholder="Comma-separated outcomes"
                 className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-gray-400 focus:outline-none"
               />
+            )}
+            {outcomeMode === 'scalar' && (
+              <div className="mt-2">
+                <label className="mb-1 block text-xs font-medium text-gray-600">
+                  Decimals (reported value ÷ 10^decimals)
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={decimals}
+                  onChange={(e) => setDecimals(e.target.value)}
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-gray-400 focus:outline-none"
+                />
+              </div>
             )}
             <p className="mt-1.5 text-xs text-gray-500">
               Outcomes: {outcomePreview}
@@ -201,7 +233,7 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
                 className="w-full rounded-lg border border-border px-3 py-2 pr-12 text-sm focus:border-gray-400 focus:outline-none"
               />
               <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-300">
-                REP
+                <RepToken />
               </span>
             </div>
             <p className="mt-1.5 text-xs text-gray-500">
@@ -214,7 +246,7 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
               <span className="text-sm text-gray-600">Protocol fee</span>
               <span className="text-right">
                 <span className="text-sm text-gray-900">
-                  {formatRep(protocolFeeRep)} REP
+                  {formatRep(protocolFeeRep)} <RepToken />
                 </span>{' '}
                 <span className="text-xs text-gray-400">
                   ${formatUsd(protocolFeeUsd)}
@@ -225,7 +257,7 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
               <span className="text-sm text-gray-600">AMM price</span>
               <span className="text-right">
                 <span className="text-sm text-gray-900">
-                  {formatRep(ammPriceRep)} REP
+                  {formatRep(ammPriceRep)} <RepToken />
                 </span>{' '}
                 <span className="text-xs text-gray-400">
                   ${formatUsd(ammPriceUsd)}
@@ -241,7 +273,7 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
                   {bestSource}
                 </span>
                 <span className="text-base font-semibold text-gray-900">
-                  {formatRep(feeRep)} REP
+                  {formatRep(feeRep)} <RepToken />
                 </span>
                 <span className="text-xs text-gray-400">
                   ≈ ${formatUsd(bestPriceUsd)}
@@ -254,7 +286,7 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
                   <span className="text-sm text-gray-600">Tip</span>
                   <span className="text-right">
                     <span className="text-sm text-gray-900">
-                      +{formatRep(tipNum)} REP
+                      +{formatRep(tipNum)} <RepToken />
                     </span>{' '}
                     <span className="text-xs text-gray-400">
                       ${formatUsd(tipNum * repPrice)}
@@ -267,7 +299,7 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
                   </span>
                   <span className="inline-flex items-baseline gap-2">
                     <span className="text-base font-semibold text-gray-900">
-                      {formatRep(totalRep)} REP
+                      {formatRep(totalRep)} <RepToken />
                     </span>
                     <span className="text-xs text-gray-400">
                       ≈ ${formatUsd(totalRep * repPrice)}
@@ -277,7 +309,7 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
               </>
             )}
             <p className="mt-2 text-xs text-gray-500">
-              Your wallet: {formatRep(walletBalance)} REP
+              Your wallet: {formatRep(walletBalance)} <RepToken />
             </p>
           </div>
 
@@ -288,7 +320,7 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
             }
             className="w-full rounded-lg bg-augur-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-augur-green-dark disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Create query for {formatRep(totalRep)} REP
+            Create query for {formatRep(totalRep)} <RepToken />
           </button>
         </form>
 

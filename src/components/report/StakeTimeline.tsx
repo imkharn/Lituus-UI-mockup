@@ -1,5 +1,6 @@
 import type { MockQuery } from '../../types/query'
 import { formatRep, relativeTime, truncateAddress } from '../../lib/actions'
+import { RepToken } from '../rep/RepToken'
 
 interface StakeTimelineProps {
   query: MockQuery
@@ -24,7 +25,7 @@ export function StakeTimeline({ query }: StakeTimelineProps) {
         <div className="text-right">
           <p className="text-xs text-gray-500">Total staked</p>
           <p className="text-sm font-semibold text-gray-900">
-            {formatRep(total)} REP
+            {formatRep(total)} <RepToken />
           </p>
         </div>
       </div>
@@ -87,7 +88,7 @@ export function StakeTimeline({ query }: StakeTimelineProps) {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-900">
-                    {formatRep(s.amount)} REP
+                    {formatRep(s.amount)} <RepToken />
                   </p>
                   <p className="text-xs text-gray-500">
                     {relativeTime(s.timestamp)}

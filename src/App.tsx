@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import type { TabId } from './types/query'
 import { useQueries } from './hooks/useQueries'
+import { UniverseProvider, useUniverse } from './context/UniverseContext'
 import { Header } from './components/layout/Header'
 import { Toast } from './components/layout/Toast'
 import { ReportTab } from './components/report/ReportTab'
@@ -10,7 +11,7 @@ import { StatsTab } from './components/stats/StatsTab'
 
 const DARK_STORAGE_KEY = 'lituus-dark'
 
-export default function App() {
+function AppShell() {
   const [tab, setTab] = useState<TabId>('report')
   const [dark, setDark] = useState(() => {
     try {
@@ -30,8 +31,10 @@ export default function App() {
     addRep,
     reset,
     skipTime,
+    showToast,
     clearToast,
   } = useQueries()
+  const { reportListEmpty } = useUniverse()
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark)
@@ -41,6 +44,9 @@ export default function App() {
       /* ignore */
     }
   }, [dark])
+
+  // Forked universes have no open reporting work — everything is resolved or refunded.
+  const reportQueries = reportListEmpty ? [] : queries
 
   return (
     <>
@@ -56,12 +62,13 @@ export default function App() {
           onAddRep={addRep}
           onReset={reset}
           onSkipTime={skipTime}
+          onToast={showToast}
         />
 
         <main>
           {tab === 'report' && (
             <ReportTab
-              queries={queries}
+              queries={reportQueries}
               walletBalance={wallet.repBalance}
               onStake={stake}
               onClaim={claim}
@@ -80,5 +87,13 @@ export default function App() {
 
       <Toast message={toast} onClose={clearToast} dark={dark} />
     </>
+  )
+}
+
+export default function App() {
+  return (
+    <UniverseProvider>
+      <AppShell />
+    </UniverseProvider>
   )
 }

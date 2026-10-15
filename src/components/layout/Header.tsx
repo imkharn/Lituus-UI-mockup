@@ -1,8 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
 import type { TabId } from '../../types/query'
 import { formatRep } from '../../lib/actions'
+import { useUniverse } from '../../context/UniverseContext'
+import { RepToken } from '../rep/RepToken'
 import { SettingsModal } from './SettingsModal'
+import { SwitchUniverseModal } from '../universe/SwitchUniverseModal'
+import { TrueUniverseFrame } from '../universe/TrueUniverseFrame'
 
 interface HeaderProps {
   activeTab: TabId
@@ -13,6 +17,7 @@ interface HeaderProps {
   onAddRep: () => void
   onReset: () => void
   onSkipTime: () => void
+  onToast: (message: string) => void
 }
 
 const TABS: { id: TabId; label: string }[] = [
@@ -30,8 +35,26 @@ export function Header({
   onAddRep,
   onReset,
   onSkipTime,
+  onToast,
 }: HeaderProps) {
+  const { universeId, universes, setUniverseId, createChildUniverse, markPendingFork } =
+    useUniverse()
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [walletMenuOpen, setWalletMenuOpen] = useState(false)
+  const [switchOpen, setSwitchOpen] = useState(false)
+  const [trueFrameOpen, setTrueFrameOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!walletMenuOpen) return
+    const onDoc = (e: MouseEvent) => {
+      if (!menuRef.current?.contains(e.target as Node)) {
+        setWalletMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onDoc)
+    return () => document.removeEventListener('mousedown', onDoc)
+  }, [walletMenuOpen])
 
   return (
     <>
@@ -122,11 +145,38 @@ export function Header({
                 )}
               </span>
             </button>
-            <div className="flex items-center gap-2 rounded-full border border-border bg-gray-50 px-3 py-1.5 text-sm">
-              <span className="h-2 w-2 rounded-full bg-augur-green" />
-              <span className="font-medium text-gray-900">
-                {formatRep(repBalance)} REP
-              </span>
+
+            <div className="relative" ref={menuRef}>
+              <button
+                type="button"
+                onClick={() => setWalletMenuOpen((o) => !o)}
+                className="flex items-center gap-2 rounded-full border border-border bg-gray-50 px-3 py-1.5 text-sm hover:bg-gray-100"
+              >
+                <span className="h-2 w-2 rounded-full bg-augur-green" />
+                <span className="font-medium text-gray-900">
+                  {formatRep(repBalance)} <RepToken />
+                </span>
+              </button>
+
+              {walletMenuOpen && (
+                <div className="absolute right-0 z-50 mt-2 w-52 overflow-hidden rounded-xl border border-border bg-white shadow-lg">
+                  <div className="border-b border-border px-4 py-2.5">
+                    <p className="text-sm font-semibold text-gray-900">
+                      Universe {universeId}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setWalletMenuOpen(false)
+                      setSwitchOpen(true)
+                    }}
+                    className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-900 hover:bg-gray-50"
+                  >
+                    Switch Universe
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -138,6 +188,39 @@ export function Header({
         onAddRep={onAddRep}
         onReset={onReset}
         onSkipTime={onSkipTime}
+      />
+
+      <SwitchUniverseModal
+        open={switchOpen}
+        currentUniverseId={universeId}
+        onClose={() => setSwitchOpen(false)}
+        onGoToUniverse={(id) => {
+          if (!universes[id]) {
+            onToast(`Universe ${id} does not exist`)
+            return
+          }
+          setUniverseId(id)
+          setSwitchOpen(false)
+          onToast(`Switched to Universe ${id}`)
+        }}
+        onGoToTrue={() => {
+          setSwitchOpen(false)
+          setTrueFrameOpen(true)
+        }}
+      />
+
+      <TrueUniverseFrame
+        open={trueFrameOpen}
+        universes={universes}
+        walletBalance={repBalance}
+        onClose={() => setTrueFrameOpen(false)}
+        onAffirm={(id) => {
+          setUniverseId(id)
+          onToast(`Affirmed Universe ${id} as True`)
+        }}
+        onCreateChild={createChildUniverse}
+        onMarkPendingFork={markPendingFork}
+        onToast={onToast}
       />
     </>
   )

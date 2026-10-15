@@ -45,10 +45,11 @@ export function QueryHelp({
               How query creation works
             </h4>
             <p className="mt-1">
-              You pay a query fee in REP (or redeem a Query Token from the AMM
-              when cheaper). Reporters stake REP on outcomes in an escalation
-              game. After a 1-day appeal window with no further stake, the
-              tentative outcome becomes final.
+              You pay a query fee in REP (shown with the current universe
+              superscript) or redeem a Query Token from the AMM when cheaper.
+              Reporters stake REP on outcomes in an escalation game. After a
+              1-day appeal window with no further stake, the tentative outcome
+              becomes final.
             </p>
           </section>
 
@@ -57,7 +58,7 @@ export function QueryHelp({
             <ul className="mt-1 list-disc space-y-1 pl-5">
               <li>
                 No multisig or admin key can override a resolution — only REP
-                holders via the escalation / fork game.
+                holders in the current universe via the escalation / fork game.
               </li>
               <li>
                 Incorrect resolution requires an attacker to win the full
@@ -78,8 +79,7 @@ export function QueryHelp({
                 ${formatRep(attackCost)}
               </strong>{' '}
               to force an incorrect resolution. This is the attack cost: the
-              REP fully diluted valuation ($
-              {formatRep(mockStats.repFdvUsd)}) times the{' '}
+              REP FDV (${formatRep(mockStats.repFdvUsd)}) times the{' '}
               {mockStats.securityMargin}× security margin. Anything less can be
               appealed by honest reporters who profit from correcting it.
             </p>

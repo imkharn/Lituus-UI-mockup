@@ -5,6 +5,7 @@ import {
   formatTimeRemaining,
 } from '../../lib/actions'
 import { availableProfit } from '../../lib/profit'
+import { RepToken } from '../rep/RepToken'
 import { QueryExpanded } from './QueryExpanded'
 
 interface QueryRowProps {
@@ -35,9 +36,13 @@ export function QueryRow({
         ? '—'
         : query.outcomes[query.tentativeOutcome]
 
-  const bondLabel = query.isResolved
-    ? '–'
-    : `${formatRep(query.appealBond || query.fee)} REP`
+  const bondLabel = query.isResolved ? (
+    '–'
+  ) : (
+    <>
+      {formatRep(query.appealBond || query.fee)} <RepToken />
+    </>
+  )
 
   const bondHeader = query.isResolved
     ? 'Bond'
@@ -57,7 +62,13 @@ export function QueryRow({
 
   const profit = availableProfit(query)
   const profitLabel =
-    profit == null ? '–' : `${formatRep(profit)} REP`
+    profit == null ? (
+      '–'
+    ) : (
+      <>
+        {formatRep(profit)} <RepToken />
+      </>
+    )
 
   return (
     <div

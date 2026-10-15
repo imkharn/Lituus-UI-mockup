@@ -67,6 +67,10 @@ export function useQueries() {
     dispatch({ type: 'SKIP_TIME', ms: TWO_HOURS_MS })
   }, [])
 
+  const showToast = useCallback((message: string) => {
+    dispatch({ type: 'SHOW_TOAST', message })
+  }, [])
+
   return {
     queries: state.queries,
     wallet: state.wallet,
@@ -78,6 +82,7 @@ export function useQueries() {
     addRep,
     reset,
     skipTime,
+    showToast,
     clearToast: () => dispatch({ type: 'CLEAR_TOAST' }),
   }
 }

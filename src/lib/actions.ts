@@ -14,6 +14,7 @@ export type AppAction =
   | { type: 'MIGRATE'; queryId: number; childLabel: string; amount: number }
   | { type: 'TICK'; ms: number }
   | { type: 'CLEAR_TOAST' }
+  | { type: 'SHOW_TOAST'; message: string }
   | { type: 'ADD_REP'; amount: number }
   | { type: 'RESET' }
   | { type: 'SKIP_TIME'; ms: number }
@@ -33,6 +34,9 @@ export function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case 'CLEAR_TOAST':
       return { ...state, toast: null }
+
+    case 'SHOW_TOAST':
+      return { ...state, toast: action.message }
 
     case 'RESET':
       return {

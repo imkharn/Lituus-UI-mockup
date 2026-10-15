@@ -10,16 +10,18 @@ import {
 } from 'recharts'
 import { mockStats } from '../../data/mockQueries'
 import { formatRep } from '../../lib/actions'
+import { useUniverse } from '../../context/UniverseContext'
 
 export function StatsTab() {
   const s = mockStats
+  const { universeId } = useUniverse()
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-8">
       <h2 className="text-lg font-semibold text-gray-900">Protocol stats</h2>
       <p className="mt-1 text-sm text-gray-500">
-        Live metrics for reporters and query creators. Open interest is fetched
-        from Dune in production.
+        Live metrics for reporters and query creators in Universe {universeId}.
+        Open interest is fetched from Dune in production.
       </p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -41,7 +43,7 @@ export function StatsTab() {
         <MetricCard
           label="Estimated attack cost"
           value={`$${(s.attackCostUsd / 1e6).toFixed(1)}M`}
-          hint={`$${(s.repFdvUsd / 1e6).toFixed(1)}M REP FDV × ${s.securityMargin} = $${(s.attackCostUsd / 1e6).toFixed(1)}M`}
+          hint={`$${(s.repFdvUsd / 1e6).toFixed(1)}M REP^${universeId} FDV × ${s.securityMargin} = $${(s.attackCostUsd / 1e6).toFixed(1)}M`}
         />
         <MetricCard
           label="Average burn rate"

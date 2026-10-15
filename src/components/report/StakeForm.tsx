@@ -3,6 +3,7 @@ import type { MockQuery } from '../../types/query'
 import { currentReporterPay, toWinBreakdown } from '../../lib/profit'
 import { mockStats } from '../../data/mockQueries'
 import { formatRep, formatTimeRemaining, formatUsd } from '../../lib/actions'
+import { RepToken } from '../rep/RepToken'
 
 interface StakeFormProps {
   query: MockQuery
@@ -55,8 +56,10 @@ export function StakeForm({
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
           <p className="text-sm text-emerald-900">
             You have{' '}
-            <strong>{formatRep(query.claimableAmount)} REP</strong> (≈ $
-            {formatUsd(query.claimableAmount * repPrice)}) in winning stakes
+            <strong>
+              {formatRep(query.claimableAmount)} <RepToken />
+            </strong>{' '}
+            (≈ ${formatUsd(query.claimableAmount * repPrice)}) in winning stakes
             ready to claim.
           </p>
           <p className="mt-1 text-xs text-emerald-800">
@@ -68,7 +71,7 @@ export function StakeForm({
           onClick={onClaim}
           className="w-full rounded-lg bg-augur-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-augur-green-dark"
         >
-          Claim {formatRep(query.claimableAmount)} REP
+          Claim {formatRep(query.claimableAmount)} <RepToken />
         </button>
       </div>
     )
@@ -103,10 +106,10 @@ export function StakeForm({
             Migrate to a fork
           </p>
           <p className="mt-1 text-xs text-amber-800">
-            Fork state {query.forkInfo.forkState}: migrate your REP into the
-            child universe you believe is correct. If you fail to migrate in the
-            next {formatTimeRemaining(query.timeRemainingMs)} your REP will
-            become worthless.
+            Fork state {query.forkInfo.forkState}: migrate your <RepToken />{' '}
+            into the child universe you believe is correct. If you fail to
+            migrate in the next {formatTimeRemaining(query.timeRemainingMs)}{' '}
+            your <RepToken /> will become worthless.
           </p>
         </div>
         <div>
@@ -145,7 +148,7 @@ export function StakeForm({
               className="w-full rounded-lg border border-border bg-white px-3 py-2 pr-24 text-sm placeholder:text-gray-300 focus:border-gray-400 focus:outline-none"
             />
             <span className="pointer-events-none absolute right-14 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-300">
-              REP
+              <RepToken />
             </span>
             <button
               type="button"
@@ -165,8 +168,8 @@ export function StakeForm({
           onClick={() => onMigrate(migrateTarget, migrateNum)}
           className="w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          Migrate {migrateNum > 0 ? `${formatRep(migrateNum)} ` : ''}REP to{' '}
-          {migrateTarget}
+          Migrate {migrateNum > 0 ? `${formatRep(migrateNum)} ` : ''}
+          <RepToken /> to {migrateTarget}
         </button>
         <InfoBlock query={{ ...query, question: forkQuestion }} />
       </div>
@@ -232,7 +235,7 @@ export function StakeForm({
               className="w-full rounded-lg border border-border bg-white px-3 py-2 pr-24 text-sm placeholder:text-gray-300 focus:border-gray-400 focus:outline-none"
             />
             <span className="pointer-events-none absolute right-14 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-300">
-              REP
+              <RepToken />
             </span>
             <button
               type="button"
@@ -262,7 +265,7 @@ export function StakeForm({
               className="w-full rounded-lg border border-border bg-gray-50 px-3 py-2 pr-12 text-sm text-gray-900 placeholder:text-gray-300"
             />
             <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-300">
-              REP
+              <RepToken />
             </span>
           </div>
           <p className="mt-1 text-xs text-gray-400">
@@ -276,31 +279,31 @@ export function StakeForm({
           <div className="flex items-center justify-between">
             <span>Your bond</span>
             <span className="font-medium text-gray-900">
-              {formatRep(breakdown.bond)} REP
+              {formatRep(breakdown.bond)} <RepToken />
             </span>
           </div>
           <div className="flex items-center justify-between">
             <span>80% of Losing Bonds</span>
             <span className="font-medium text-gray-900">
-              {formatRep(breakdown.losingShare)} REP
+              {formatRep(breakdown.losingShare)} <RepToken />
             </span>
           </div>
           <div className="flex items-center justify-between">
             <span>Tip</span>
             <span className="font-medium text-gray-900">
-              {formatRep(breakdown.tip)} REP
+              {formatRep(breakdown.tip)} <RepToken />
             </span>
           </div>
           <div className="flex items-center justify-between">
             <span>Reporter pay</span>
             <span className="font-medium text-gray-900">
-              {formatRep(breakdown.reporterPay)} REP
+              {formatRep(breakdown.reporterPay)} <RepToken />
             </span>
           </div>
           <div className="mt-1 flex items-center justify-between border-t border-border pt-1">
             <span>To win</span>
             <span className="font-semibold text-gray-900">
-              {formatRep(toWin)} REP
+              {formatRep(toWin)} <RepToken />
             </span>
           </div>
         </div>
@@ -313,8 +316,8 @@ export function StakeForm({
         className="w-full rounded-lg bg-augur-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-augur-green-dark disabled:cursor-not-allowed disabled:opacity-40"
       >
         {cta} {query.outcomes[outcomeIndex]} — bet{' '}
-        {betNum > 0 ? formatRep(betNum) : '…'} REP to win{' '}
-        {betNum > 0 ? formatRep(toWin) : '…'} REP
+        {betNum > 0 ? formatRep(betNum) : '…'} <RepToken /> to win{' '}
+        {betNum > 0 ? formatRep(toWin) : '…'} <RepToken />
       </button>
 
       <InfoBlock query={query} />
@@ -334,9 +337,13 @@ function InfoBlock({ query }: { query: MockQuery }) {
         <p className="leading-relaxed text-gray-500">{query.description}</p>
       )}
       <p>
-        Fee {formatRep(query.fee)} REP · Reporter pay ~{formatRep(pay)} REP
+        Fee {formatRep(query.fee)} <RepToken /> · Reporter pay ~
+        {formatRep(pay)} <RepToken />
         {query.tip != null && query.tip > 0 && (
-          <> · Tip {formatRep(query.tip)} REP</>
+          <>
+            {' '}
+            · Tip {formatRep(query.tip)} <RepToken />
+          </>
         )}
       </p>
       <p>

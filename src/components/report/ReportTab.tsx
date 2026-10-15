@@ -1,5 +1,6 @@
 import type { MockQuery } from '../../types/query'
 import { mockStats } from '../../data/mockQueries'
+import { RepToken } from '../rep/RepToken'
 import { QueryList } from './QueryList'
 
 interface ReportTabProps {
@@ -60,13 +61,13 @@ export function ReportTab({
             after three days.
           </p>
           <p>
-            Bonds double each appeal round until the fork bond (~2% of REP
-            supply). If you hold the losing side of a recent appeal, you must
-            restake before the timer ends or your bond is lost.
+            Bonds double each appeal round until the fork bond (~2% of{' '}
+            <RepToken /> supply). If you hold the losing side of a recent
+            appeal, you must restake before the timer ends or your bond is lost.
           </p>
           <p>
-            During a fork, migrate REP into the child universe that matches the
-            correct outcome.
+            During a fork, migrate <RepToken /> into the child universe that
+            matches the correct outcome.
           </p>
         </div>
       </section>
