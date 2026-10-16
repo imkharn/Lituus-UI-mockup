@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { forkBondRep, type UniverseNode } from '../../data/universes'
 import { formatRep } from '../../lib/actions'
+import {
+  INVALID_OUTCOME_HEX,
+  formatOutcomeIdLabel,
+} from '../../lib/outcomeId'
 import { RepToken } from '../rep/RepToken'
 
 interface TrueUniverseFrameProps {
@@ -136,7 +140,6 @@ export function TrueUniverseFrame({
             {step.kind === 'leaf' && (
               <LeafStep
                 universe={universes[step.universeId]}
-                walletBalance={walletBalance}
                 onAffirm={() => {
                   onAffirm(step.universeId)
                   onClose()
@@ -223,30 +226,36 @@ function ForkStep({
   onSelect: (label: string, childId?: number) => void
 }) {
   const fork = universe.forkQuery
-  // rawIds kind, or scalar forks that omit outcomes= encoding, use numeric buttons.
-  const showRawIds =
-    fork?.kind === 'rawIds' ||
-    (fork?.kind === 'scalar' && !fork.queryText.includes('['))
+  // Scalar forks omit outcomes= encoding — show price buttons + Invalid + free id.
+  const isScalarNoEncoding =
+    fork?.kind === 'scalar' && !fork.queryText.includes('[')
+  const showRawIds = fork?.kind === 'rawIds' || isScalarNoEncoding
+
   const buttons = useMemo(() => {
     if (!fork) return []
-    if (showRawIds) {
-      return [
-        ...fork.outcomes.map((o) => ({
-          label: o.label,
-          childId: o.childUniverseId,
-        })),
-        { label: INVALID_OUTCOME, childId: undefined as number | undefined },
-      ]
-    }
-    return fork.outcomes.map((o) => ({
+    const mapped = fork.outcomes.map((o) => ({
       label: o.label,
+      outcomeId: o.outcomeId,
       childId: o.childUniverseId,
     }))
+    const hasInvalid = mapped.some(
+      (b) => b.label === INVALID_OUTCOME || b.outcomeId === INVALID_OUTCOME_HEX,
+    )
+    if (showRawIds && !hasInvalid) {
+      mapped.push({
+        label: INVALID_OUTCOME,
+        outcomeId: INVALID_OUTCOME_HEX,
+        childId: undefined,
+      })
+    }
+    return mapped
   }, [fork, showRawIds])
 
   if (!fork) {
     return <p className="text-sm text-gray-600">No fork query on this universe.</p>
   }
+
+  const decimals = fork.decimals ?? 0
 
   return (
     <div className="space-y-4">
@@ -262,8 +271,8 @@ function ForkStep({
         </p>
         {fork.kind === 'scalar' || fork.decimals != null ? (
           <p className="mt-2 text-xs text-gray-500">
-            Scalar · decimals = {fork.decimals ?? 0} (divide reported value by
-            10^{fork.decimals ?? 0})
+            scalar · decimals={decimals} · outcomeId = answer / 10^
+            {decimals}
           </p>
         ) : null}
       </div>
@@ -274,17 +283,15 @@ function ForkStep({
         </p>
         {buttons.map((b) => (
           <button
-            key={b.label}
+            key={`${b.label}-${b.outcomeId}`}
             type="button"
             onClick={() => onSelect(b.label, b.childId)}
             className="w-full rounded-xl border border-border bg-white px-4 py-3 text-left text-sm font-semibold text-gray-900 hover:border-gray-400 hover:bg-gray-50"
           >
             {b.label}
-            {b.childId != null && (
-              <span className="ml-2 text-xs font-normal text-gray-400">
-                → Universe {b.childId}
-              </span>
-            )}
+            <span className="ml-2 font-mono text-xs font-normal text-gray-400">
+              {formatOutcomeIdLabel(b.outcomeId)}
+            </span>
           </button>
         ))}
 
@@ -315,12 +322,10 @@ function ForkStep({
 
 function LeafStep({
   universe,
-  walletBalance,
   onAffirm,
   onFork,
 }: {
   universe: UniverseNode
-  walletBalance: number
   onAffirm: () => void
   onFork: () => void
 }) {
@@ -330,15 +335,12 @@ function LeafStep({
   return (
     <div className="space-y-4">
       <div className="rounded-lg border border-border bg-white p-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-          Leaf universe
-        </p>
-        <h3 className="mt-1 text-base font-semibold text-gray-900">
+        <h3 className="text-base font-semibold text-gray-900">
           Universe {universe.id}
         </h3>
         <p className="mt-2 text-sm text-gray-600">
-          Supply {formatRep(universe.supply)}{' '}
-          <RepToken universeId={universe.id} /> · no further child forks
+          {formatRep(universe.supply)} <RepToken universeId={universe.id} /> has
+          migrated to this universe so far
           {pending ? ' · pending fork (no children assigned yet)' : ''}.
         </p>
       </div>
@@ -356,11 +358,10 @@ function LeafStep({
         onClick={onFork}
         className="w-full rounded-xl border border-border bg-white px-4 py-3.5 text-left text-sm font-semibold text-gray-900 hover:bg-gray-50"
       >
-        Fork Universe {universe.id} ({formatRep(bond)}{' '}
-        <RepToken universeId={universe.id} />)
+        Fork Universe {universe.id}
         <span className="mt-1 block text-xs font-normal text-gray-500">
-          Requires 0.4% of supply · wallet {formatRep(walletBalance)}{' '}
-          <RepToken universeId={universe.id} />
+          {formatRep(bond)} <RepToken universeId={universe.id} /> (0.4% of
+          supply)
         </span>
       </button>
     </div>

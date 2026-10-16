@@ -1,3 +1,5 @@
+import { INVALID_OUTCOME_HEX, outcomeIdHex } from '../lib/outcomeId'
+
 /** Genesis REP supply in universe 0. */
 export const GENESIS_SUPPLY = 6_000_000
 
@@ -10,8 +12,10 @@ export const FORK_BOND_FRACTION = 0.004
 export type ForkQueryKind = 'categorical' | 'scalar' | 'rawIds'
 
 export interface ForkOutcome {
-  /** Display label for the button (or outcome id string). */
+  /** Display label for the button (human-readable). */
   label: string
+  /** On-chain / encoding outcome id shown in gray beside the button. */
+  outcomeId: string
   /** Child universe created by this outcome, if any. */
   childUniverseId?: number
   /** True when this was the Polymarket-resolved / majority-correct outcome. */
@@ -22,12 +26,12 @@ export interface ForkQuery {
   /** Short title shown above the query body. */
   title: string
   /**
-   * Full query body. May include trailing `[00=Yes,01=No,FF=Invalid]` encoding.
-   * Omitted encoding (rawIds) shows numeric outcome buttons instead.
+   * Full query body. Categorical queries append
+   * `[00=Yes,01=No,<2^256-1 hex>=Invalid]`. Scalar forks omit that encoding.
    */
   queryText: string
   kind: ForkQueryKind
-  /** For scalar queries: divide reported value by 10^decimals. */
+  /** For scalar queries: answer = outcomeId / 10^decimals (display convention). */
   decimals?: number
   outcomes: ForkOutcome[]
   /** When true, also show Invalid + free-form outcome-id input. */
@@ -76,42 +80,65 @@ function buildUniverses(): Record<number, UniverseNode> {
   const u5Supply = u4Supply * CORRECT_SHARE
   const u6Supply = u4Supply * (1 - CORRECT_SHARE)
 
+  const invalidEnc = `${INVALID_OUTCOME_HEX}=Invalid`
+
   const fork0: ForkQuery = {
     title: '2024 US Presidential Election',
-    queryText:
-      'Will Donald Trump win the 2024 United States presidential election? [00=Yes,01=No,FF=Invalid]',
+    queryText: `Will Donald Trump win the 2024 United States presidential election? [00=Yes,01=No,${invalidEnc}]`,
     kind: 'categorical',
     outcomes: [
-      { label: 'Yes', childUniverseId: 1, isCorrect: true },
-      { label: 'No', childUniverseId: 2 },
-      { label: 'Invalid' },
+      {
+        label: 'Yes',
+        outcomeId: outcomeIdHex(0),
+        childUniverseId: 1,
+        isCorrect: true,
+      },
+      { label: 'No', outcomeId: outcomeIdHex(1), childUniverseId: 2 },
+      { label: 'Invalid', outcomeId: INVALID_OUTCOME_HEX },
     ],
     allowCustomOutcome: true,
   }
 
   const fork1: ForkQuery = {
     title: 'Trump inauguration',
-    queryText:
-      'Will Donald Trump be inaugurated as President of the United States on January 20, 2025? [00=Yes,01=No,FF=Invalid]',
+    queryText: `Will Donald Trump be inaugurated as President of the United States on January 20, 2025? [00=Yes,01=No,${invalidEnc}]`,
     kind: 'categorical',
     outcomes: [
-      { label: 'Yes', childUniverseId: 3, isCorrect: true },
-      { label: 'No', childUniverseId: 4 },
-      { label: 'Invalid' },
+      {
+        label: 'Yes',
+        outcomeId: outcomeIdHex(0),
+        childUniverseId: 3,
+        isCorrect: true,
+      },
+      { label: 'No', outcomeId: outcomeIdHex(1), childUniverseId: 4 },
+      { label: 'Invalid', outcomeId: INVALID_OUTCOME_HEX },
     ],
     allowCustomOutcome: true,
   }
 
-  // Scalar + missing outcomes= encoding: buttons show 0, 1, Invalid, empty box.
+  // Scalar, no outcomes= encoding in query text. Adjacent cent prices; decimals=2.
+  // Shown formula: outcomeId = answer / 10^decimals.
+  const btcA = 75432.5
+  const btcB = 75432.51
+  const btcDecimals = 2
   const fork4: ForkQuery = {
     title: 'Bitcoin price at 2024 election midnight (scalar)',
     queryText:
-      'What was the BTC/USD price on Coinbase at 00:00 UTC on November 6, 2024? Report the integer USD price; the UI divides by 10^decimals where decimals=0.',
+      'What was the BTC/USD price on Coinbase at 00:00 UTC on November 6, 2024?',
     kind: 'scalar',
-    decimals: 0,
+    decimals: btcDecimals,
     outcomes: [
-      { label: '0', childUniverseId: 5, isCorrect: true },
-      { label: '1', childUniverseId: 6 },
+      {
+        label: btcA.toFixed(btcDecimals),
+        outcomeId: String(btcA / 10 ** btcDecimals),
+        childUniverseId: 5,
+        isCorrect: true,
+      },
+      {
+        label: btcB.toFixed(btcDecimals),
+        outcomeId: String(btcB / 10 ** btcDecimals),
+        childUniverseId: 6,
+      },
     ],
     allowCustomOutcome: true,
   }

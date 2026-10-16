@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { mockStats } from '../../data/mockQueries'
 import { formatRep, formatUsd } from '../../lib/actions'
+import { INVALID_OUTCOME_HEX, outcomeIdHex } from '../../lib/outcomeId'
 import { BenefitBanner } from '../layout/BenefitBanner'
 import { RepToken } from '../rep/RepToken'
 import { QueryHelp } from './QueryHelp'
@@ -52,14 +53,18 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
     outcomeMode === 'binary'
       ? outcomes.join(' · ')
       : outcomeMode === 'scalar'
-        ? `scalar · decimals=${decimals || '0'} (value ÷ 10^${decimals || '0'})`
+        ? `scalar · decimals=${decimals || '0'} · outcomeId = answer / 10^${decimals || '0'}`
         : outcomes
             .map((o, i) => {
               const hex =
                 i === outcomes.length - 1
-                  ? 'FF'
-                  : i.toString(16).padStart(2, '0').toUpperCase()
-              return `outcome ${hex} = ${o}`
+                  ? INVALID_OUTCOME_HEX
+                  : outcomeIdHex(i)
+              const shown =
+                hex === INVALID_OUTCOME_HEX
+                  ? `${'F'.repeat(4)}…${'F'.repeat(4)}`
+                  : hex
+              return `outcome ${shown} = ${o}`
             })
             .join(', ')
 
@@ -77,16 +82,13 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
 
     const suffix =
       outcomeMode === 'binary'
-        ? ' [00=No,01=Yes,FF=Invalid]'
+        ? ` [00=No,01=Yes,${INVALID_OUTCOME_HEX}=Invalid]`
         : outcomeMode === 'scalar'
-          ? ` [scalar,decimals=${Number(decimals) || 0}]`
+          ? ` [scalar,decimals=${Number(decimals) || 0},outcomeId=answer/10^decimals]`
           : ` [${outcomes
               .slice(0, -1)
-              .map(
-                (o, i) =>
-                  `${i.toString(16).padStart(2, '0').toUpperCase()}=${o}`,
-              )
-              .join(',')},FF=Invalid]`
+              .map((o, i) => `${outcomeIdHex(i)}=${o}`)
+              .join(',')},${INVALID_OUTCOME_HEX}=Invalid]`
 
     onCreate(question.trim() + suffix, outcomes, feeRep, tip)
     setSubmitted(true)

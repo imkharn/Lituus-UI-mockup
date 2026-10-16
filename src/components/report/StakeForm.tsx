@@ -3,6 +3,7 @@ import type { MockQuery } from '../../types/query'
 import { currentReporterPay, toWinBreakdown } from '../../lib/profit'
 import { mockStats } from '../../data/mockQueries'
 import { formatRep, formatTimeRemaining, formatUsd } from '../../lib/actions'
+import { INVALID_OUTCOME_HEX, outcomeIdHex } from '../../lib/outcomeId'
 import { RepToken } from '../rep/RepToken'
 
 interface StakeFormProps {
@@ -89,8 +90,8 @@ export function StakeForm({
       .map((o, i) => {
         const hex =
           i === query.outcomes.length - 1
-            ? 'FF'
-            : i.toString(16).padStart(2, '0').toUpperCase()
+            ? INVALID_OUTCOME_HEX
+            : outcomeIdHex(i)
         return `${hex}=${o}`
       })
       .join(',')}]`

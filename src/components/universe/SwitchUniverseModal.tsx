@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import { TRUE_UNIVERSE_ID } from '../../data/universes'
-
 interface SwitchUniverseModalProps {
   open: boolean
   currentUniverseId: number
@@ -80,8 +78,8 @@ export function SwitchUniverseModal({
           >
             <span className="text-sm font-semibold">Go to the True universe</span>
             <span className="mt-1 block text-xs text-gray-300">
-              Walk the fork tree from genesis (currently Universe{' '}
-              {TRUE_UNIVERSE_ID})
+              Answer controversial questions to arrive at the version of Augur
+              that resolves correctly.
             </span>
           </button>
         </div>
