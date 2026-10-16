@@ -82,9 +82,10 @@ function buildUniverses(): Record<number, UniverseNode> {
 
   const invalidEnc = `${INVALID_OUTCOME_HEX}=Invalid`
 
+  // Controversial Polymarket-style markets that actually divided traders.
   const fork0: ForkQuery = {
-    title: '2024 US Presidential Election',
-    queryText: `Will Donald Trump win the 2024 United States presidential election? [00=Yes,01=No,${invalidEnc}]`,
+    title: 'Presidential Election Winner 2024',
+    queryText: `Will Donald Trump win the 2024 US Presidential Election? This market resolves to Yes if Donald J. Trump is the projected winner of the 2024 United States presidential election according to a consensus of major decision desks (Associated Press, Fox News, NBC, CNN, and ABC) calling the race, or if he receives a majority of electoral votes as certified by Congress on January 6, 2025 — whichever is first unambiguous. Third-party or write-in winners, a contingent House election under the 12th Amendment that does not produce Trump, or a failure to certify by the resolution deadline resolve Invalid. [00=Yes,01=No,${invalidEnc}]`,
     kind: 'categorical',
     outcomes: [
       {
@@ -100,8 +101,8 @@ function buildUniverses(): Record<number, UniverseNode> {
   }
 
   const fork1: ForkQuery = {
-    title: 'Trump inauguration',
-    queryText: `Will Donald Trump be inaugurated as President of the United States on January 20, 2025? [00=Yes,01=No,${invalidEnc}]`,
+    title: 'Trump Inauguration — January 20, 2025',
+    queryText: `Will Donald Trump be inaugurated as President of the United States on January 20, 2025? This market resolves Yes if Trump takes the presidential oath of office on January 20, 2025 (US Eastern Time), as the ceremony is conducted under the Twentieth Amendment — including if the public ceremony is relocated, delayed within that calendar day, or held indoors for security/weather. It resolves No if any other person is inaugurated that day, if inauguration is postponed past January 20, 2025, or if Trump does not take the oath that day. Disputes that make the oath's occurrence or date genuinely indeterminate resolve Invalid. [00=Yes,01=No,${invalidEnc}]`,
     kind: 'categorical',
     outcomes: [
       {
@@ -122,9 +123,9 @@ function buildUniverses(): Record<number, UniverseNode> {
   const btcB = 75432.51
   const btcDecimals = 2
   const fork4: ForkQuery = {
-    title: 'Bitcoin price at 2024 election midnight (scalar)',
+    title: 'Bitcoin price on election night (Nov 6, 2024)',
     queryText:
-      'What was the BTC/USD price on Coinbase at 00:00 UTC on November 6, 2024?',
+      'What was the BTC/USD last trade price on Coinbase at 00:00:00 UTC on November 6, 2024 (the first midnight UTC after US polls closed on Election Day 2024)? Use the Coinbase Advanced Trade BTC-USD ticker; if that feed is unavailable, fall back to the Coinbase spot BTC-USD price at that timestamp. Report the price in US dollars and cents. If multiple prints share that exact second, use the last trade stamped at or immediately before 00:00:00 UTC.',
     kind: 'scalar',
     decimals: btcDecimals,
     outcomes: [

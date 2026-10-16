@@ -120,9 +120,6 @@ export function TrueUniverseFrame({
             <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">
               True-universe resolver · external frame
             </p>
-            <h2 className="text-sm font-semibold text-gray-900">
-              Walk forks to the True universe
-            </h2>
           </div>
 
           <div className="p-4">
@@ -278,9 +275,6 @@ function ForkStep({
       </div>
 
       <div className="space-y-2">
-        <p className="text-xs font-medium text-gray-500">
-          Choose the outcome you believe is True
-        </p>
         {buttons.map((b) => (
           <button
             key={`${b.label}-${b.outcomeId}`}
