@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { mockStats } from '../../data/mockQueries'
 import { formatRep, formatUsd } from '../../lib/actions'
-import { INVALID_OUTCOME_HEX, outcomeIdHex } from '../../lib/outcomeId'
+import { outcomeIdHex } from '../../lib/outcomeId'
 import { BenefitBanner } from '../layout/BenefitBanner'
 import { RepToken } from '../rep/RepToken'
 import { QueryHelp } from './QueryHelp'
@@ -49,23 +49,19 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
     return [...parts, 'Invalid']
   }, [outcomeMode, outcomeLabels])
 
+  // Creator-facing outcomes only — Invalid is appended by the system after creation.
+  const creatorOutcomes =
+    outcomeMode === 'scalar'
+      ? []
+      : outcomes.filter((o) => o !== 'Invalid')
+
   const outcomePreview =
     outcomeMode === 'binary'
-      ? outcomes.join(' · ')
+      ? creatorOutcomes.join(' · ')
       : outcomeMode === 'scalar'
         ? `scalar · decimals=${decimals || '0'} · outcomeId = answer / 10^${decimals || '0'}`
-        : outcomes
-            .map((o, i) => {
-              const hex =
-                i === outcomes.length - 1
-                  ? INVALID_OUTCOME_HEX
-                  : outcomeIdHex(i)
-              const shown =
-                hex === INVALID_OUTCOME_HEX
-                  ? `${'F'.repeat(4)}…${'F'.repeat(4)}`
-                  : hex
-              return `outcome ${shown} = ${o}`
-            })
+        : creatorOutcomes
+            .map((o, i) => `outcome ${outcomeIdHex(i)} = ${o}`)
             .join(', ')
 
   const oiExceedsAttack =
@@ -80,15 +76,15 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
 
     const tip = tipNum > 0 ? tipNum : undefined
 
+    // Encoding omits Invalid — added automatically after the query is created.
     const suffix =
       outcomeMode === 'binary'
-        ? ` [00=No,01=Yes,${INVALID_OUTCOME_HEX}=Invalid]`
+        ? ` [00=No,01=Yes]`
         : outcomeMode === 'scalar'
           ? ` [scalar,decimals=${Number(decimals) || 0},outcomeId=answer/10^decimals]`
-          : ` [${outcomes
-              .slice(0, -1)
+          : ` [${creatorOutcomes
               .map((o, i) => `${outcomeIdHex(i)}=${o}`)
-              .join(',')},${INVALID_OUTCOME_HEX}=Invalid]`
+              .join(',')}]`
 
     onCreate(question.trim() + suffix, outcomes, feeRep, tip)
     setSubmitted(true)

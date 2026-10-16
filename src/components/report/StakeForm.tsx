@@ -3,7 +3,7 @@ import type { MockQuery } from '../../types/query'
 import { currentReporterPay, toWinBreakdown } from '../../lib/profit'
 import { mockStats } from '../../data/mockQueries'
 import { formatRep, formatTimeRemaining, formatUsd } from '../../lib/actions'
-import { INVALID_OUTCOME_HEX, outcomeIdHex } from '../../lib/outcomeId'
+import { outcomeIdHex } from '../../lib/outcomeId'
 import { RepToken } from '../rep/RepToken'
 
 interface StakeFormProps {
@@ -86,14 +86,10 @@ export function StakeForm({
     const tentativeLabel =
       query.outcomes[query.tentativeOutcome ?? 0] ?? 'the reported outcome'
     const baseQuestion = query.question.replace(/\s*\[[^\]]+\]\s*$/, '')
-    const outcomeList = `[${query.outcomes
-      .map((o, i) => {
-        const hex =
-          i === query.outcomes.length - 1
-            ? INVALID_OUTCOME_HEX
-            : outcomeIdHex(i)
-        return `${hex}=${o}`
-      })
+    // Encoding omits Invalid — Invalid is system-added, not part of the creator description.
+    const creatorOutcomes = query.outcomes.filter((o) => o !== 'Invalid')
+    const outcomeList = `[${creatorOutcomes
+      .map((o, i) => `${outcomeIdHex(i)}=${o}`)
       .join(',')}]`
     const forkQuestion = `Before Unix timestamp ${Math.floor(query.createdAt / 1000)}, ${tentativeLabel} was a valid answer to the question: ${baseQuestion} ${outcomeList}`
     const migrateNum = Number(migrateInput) || 0

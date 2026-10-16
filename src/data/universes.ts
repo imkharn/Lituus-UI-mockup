@@ -26,8 +26,9 @@ export interface ForkQuery {
   /** Short title shown above the query body. */
   title: string
   /**
-   * Full query body. Categorical queries append
-   * `[00=Yes,01=No,<2^256-1 hex>=Invalid]`. Scalar forks omit that encoding.
+   * Full query body. Categorical queries append creator outcomes only
+   * (e.g. `[00=Yes,01=No]`). Invalid is never encoded here — the system
+   * adds it after creation. Scalar forks omit that encoding.
    */
   queryText: string
   kind: ForkQueryKind
@@ -80,12 +81,11 @@ function buildUniverses(): Record<number, UniverseNode> {
   const u5Supply = u4Supply * CORRECT_SHARE
   const u6Supply = u4Supply * (1 - CORRECT_SHARE)
 
-  const invalidEnc = `${INVALID_OUTCOME_HEX}=Invalid`
-
   // Controversial Polymarket-style markets that actually divided traders.
+  // Outcome encodings omit Invalid — Invalid is appended by the system, not the query creator.
   const fork0: ForkQuery = {
     title: 'Presidential Election Winner 2024',
-    queryText: `Will Donald Trump win the 2024 US Presidential Election? This market resolves to Yes if Donald J. Trump is the projected winner of the 2024 United States presidential election according to a consensus of major decision desks (Associated Press, Fox News, NBC, CNN, and ABC) calling the race, or if he receives a majority of electoral votes as certified by Congress on January 6, 2025 — whichever is first unambiguous. Third-party or write-in winners, a contingent House election under the 12th Amendment that does not produce Trump, or a failure to certify by the resolution deadline resolve Invalid. [00=Yes,01=No,${invalidEnc}]`,
+    queryText: `Will Donald Trump win the 2024 US Presidential Election? This market resolves to Yes if Donald J. Trump is the projected winner of the 2024 United States presidential election according to a consensus of major decision desks (Associated Press, Fox News, NBC, CNN, and ABC) calling the race, or if he receives a majority of electoral votes as certified by Congress on January 6, 2025 — whichever is first unambiguous. Third-party or write-in winners, a contingent House election under the 12th Amendment that does not produce Trump, or a failure to certify by the resolution deadline resolve Invalid. [00=Yes,01=No]`,
     kind: 'categorical',
     outcomes: [
       {
@@ -102,7 +102,7 @@ function buildUniverses(): Record<number, UniverseNode> {
 
   const fork1: ForkQuery = {
     title: 'Trump Inauguration — January 20, 2025',
-    queryText: `Will Donald Trump be inaugurated as President of the United States on January 20, 2025? This market resolves Yes if Trump takes the presidential oath of office on January 20, 2025 (US Eastern Time), as the ceremony is conducted under the Twentieth Amendment — including if the public ceremony is relocated, delayed within that calendar day, or held indoors for security/weather. It resolves No if any other person is inaugurated that day, if inauguration is postponed past January 20, 2025, or if Trump does not take the oath that day. Disputes that make the oath's occurrence or date genuinely indeterminate resolve Invalid. [00=Yes,01=No,${invalidEnc}]`,
+    queryText: `Will Donald Trump be inaugurated as President of the United States on January 20, 2025? This market resolves Yes if Trump takes the presidential oath of office on January 20, 2025 (US Eastern Time), as the ceremony is conducted under the Twentieth Amendment — including if the public ceremony is relocated, delayed within that calendar day, or held indoors for security/weather. It resolves No if any other person is inaugurated that day, if inauguration is postponed past January 20, 2025, or if Trump does not take the oath that day. Disputes that make the oath's occurrence or date genuinely indeterminate resolve Invalid. [00=Yes,01=No]`,
     kind: 'categorical',
     outcomes: [
       {
