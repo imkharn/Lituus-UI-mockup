@@ -49,6 +49,11 @@ export interface MockQuery {
   outcomes: string[]
   fee: number
   createdAt: number
+  /**
+   * Unix seconds after which new information must not affect resolution.
+   * For open reporting queries this matches creation time.
+   */
+  informationCutoff: number
   appealBond: number
   tentativeOutcome: number | null
   finalOutcome: number | null

@@ -197,7 +197,19 @@ const e20 = escalation(
 const e21 = escalation('21', FEE, 3, [{ owner: R1, outcome: 1 }], [], 200)
 const e22 = escalation('22', FEE, 3, [{ owner: R2, outcome: 1 }], [], 300)
 
-export const initialQueries: MockQuery[] = [
+/** Event-appropriate cutoffs for resolved markets (Unix seconds). Open markets use createdAt. */
+const RESOLVED_INFORMATION_CUTOFF: Record<number, number> = {
+  // BTC first printed ≥$100k in early 2025 (narrative for this mock)
+  3: Math.floor(Date.UTC(2025, 0, 20, 15, 30, 0) / 1000),
+  // Ethereum Merge
+  20: Math.floor(Date.UTC(2022, 8, 15, 6, 42, 59) / 1000),
+  // Paris Olympics opening ceremony
+  21: Math.floor(Date.UTC(2024, 6, 26, 19, 30, 0) / 1000),
+  // Bitcoin halving ~block 840000
+  22: Math.floor(Date.UTC(2024, 3, 20, 0, 9, 27) / 1000),
+}
+
+const rawQueries: Omit<MockQuery, 'informationCutoff'>[] = [
   {
     id: 1,
     question: 'Will a spot Ethereum ETF be approved by Q3? [00=No,01=Yes]',
@@ -684,6 +696,13 @@ export const initialQueries: MockQuery[] = [
     hidden: true,
   },
 ]
+
+/** Open reporting queries: information cutoff = creation time (Unix seconds). */
+export const initialQueries: MockQuery[] = rawQueries.map((q) => ({
+  ...q,
+  informationCutoff:
+    RESOLVED_INFORMATION_CUTOFF[q.id] ?? Math.floor(q.createdAt / 1000),
+}))
 
 function buildChartSeries(): ChartPoint[] {
   const points: ChartPoint[] = []

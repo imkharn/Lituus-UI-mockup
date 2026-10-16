@@ -59,7 +59,7 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
     outcomeMode === 'binary'
       ? creatorOutcomes.join(' · ')
       : outcomeMode === 'scalar'
-        ? `scalar · decimals=${decimals || '0'} · outcomeId = answer / 10^${decimals || '0'}`
+        ? `scalar · decimals=${decimals || '0'} · answer = outcomeId / 10^${decimals || '0'}`
         : creatorOutcomes
             .map((o, i) => `outcome ${outcomeIdHex(i)} = ${o}`)
             .join(', ')
@@ -81,7 +81,7 @@ export function QueryTab({ walletBalance, onCreate }: QueryTabProps) {
       outcomeMode === 'binary'
         ? ` [00=No,01=Yes]`
         : outcomeMode === 'scalar'
-          ? ` [scalar,decimals=${Number(decimals) || 0},outcomeId=answer/10^decimals]`
+          ? ` [scalar,decimals=${Number(decimals) || 0},answer=outcomeId/10^decimals]`
           : ` [${creatorOutcomes
               .map((o, i) => `${outcomeIdHex(i)}=${o}`)
               .join(',')}]`

@@ -197,12 +197,14 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       if (state.wallet.repBalance < totalCost) {
         return { ...state, toast: 'Insufficient REP for query fee' }
       }
+      const createdAt = Date.now()
       const newQuery: MockQuery = {
         id,
         question: action.question,
         outcomes: action.outcomes,
         fee,
-        createdAt: Date.now(),
+        createdAt,
+        informationCutoff: Math.floor(createdAt / 1000),
         appealBond: fee,
         tentativeOutcome: action.outcomes.length - 1,
         finalOutcome: null,
@@ -270,6 +272,15 @@ export function formatTimeRemaining(ms: number): string {
   if (hours > 0) return `${hours}h ${mins}m`
   if (mins > 0) return `${mins}m ${secs}s`
   return `${secs}s`
+}
+
+/** Unix seconds plus local date/time with timezone, e.g. `1730851200 (Nov 5, 2024, 7:00:00 PM CST)`. */
+export function formatInformationCutoff(unixSeconds: number): string {
+  const local = new Date(unixSeconds * 1000).toLocaleString(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'long',
+  })
+  return `${unixSeconds} (${local})`
 }
 
 export function relativeTime(timestamp: number): string {

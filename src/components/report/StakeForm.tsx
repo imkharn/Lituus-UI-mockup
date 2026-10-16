@@ -2,7 +2,12 @@ import { useMemo, useState } from 'react'
 import type { MockQuery } from '../../types/query'
 import { currentReporterPay, toWinBreakdown } from '../../lib/profit'
 import { mockStats } from '../../data/mockQueries'
-import { formatRep, formatTimeRemaining, formatUsd } from '../../lib/actions'
+import {
+  formatInformationCutoff,
+  formatRep,
+  formatTimeRemaining,
+  formatUsd,
+} from '../../lib/actions'
 import { outcomeIdHex } from '../../lib/outcomeId'
 import { RepToken } from '../rep/RepToken'
 
@@ -333,6 +338,10 @@ function InfoBlock({ query }: { query: MockQuery }) {
       {query.description && (
         <p className="leading-relaxed text-gray-500">{query.description}</p>
       )}
+      <p>
+        <span className="font-medium text-gray-800">Information cutoff:</span>{' '}
+        {formatInformationCutoff(query.informationCutoff)}
+      </p>
       <p>
         Fee {formatRep(query.fee)} <RepToken /> · Reporter pay ~
         {formatRep(pay)} <RepToken />

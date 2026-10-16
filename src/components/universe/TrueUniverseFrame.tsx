@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { forkBondRep, type UniverseNode } from '../../data/universes'
-import { formatRep } from '../../lib/actions'
+import { formatInformationCutoff, formatRep } from '../../lib/actions'
 import {
   INVALID_OUTCOME_HEX,
   formatOutcomeIdLabel,
@@ -266,9 +266,13 @@ function ForkStep({
         <p className="mt-2 text-sm leading-relaxed text-gray-700">
           {fork.queryText}
         </p>
+        <p className="mt-2 text-xs text-gray-500">
+          <span className="font-medium text-gray-600">Information cutoff:</span>{' '}
+          {formatInformationCutoff(fork.informationCutoff)}
+        </p>
         {fork.kind === 'scalar' || fork.decimals != null ? (
-          <p className="mt-2 text-xs text-gray-500">
-            scalar · decimals={decimals} · outcomeId = answer / 10^
+          <p className="mt-1 text-xs text-gray-500">
+            scalar · decimals={decimals} · answer = outcomeId / 10^
             {decimals}
           </p>
         ) : null}

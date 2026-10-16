@@ -34,6 +34,11 @@ export interface ForkQuery {
   kind: ForkQueryKind
   /** For scalar queries: answer = outcomeId / 10^decimals (display convention). */
   decimals?: number
+  /**
+   * Unix seconds after which new information must not affect resolution.
+   * Shown with a local datetime in parentheses.
+   */
+  informationCutoff: number
   outcomes: ForkOutcome[]
   /** When true, also show Invalid + free-form outcome-id input. */
   allowCustomOutcome?: boolean
@@ -87,6 +92,8 @@ function buildUniverses(): Record<number, UniverseNode> {
     title: 'Presidential Election Winner 2024',
     queryText: `Will Donald Trump win the 2024 US Presidential Election? This market resolves to Yes if Donald J. Trump is the projected winner of the 2024 United States presidential election according to a consensus of major decision desks (Associated Press, Fox News, NBC, CNN, and ABC) calling the race, or if he receives a majority of electoral votes as certified by Congress on January 6, 2025 — whichever is first unambiguous. Third-party or write-in winners, a contingent House election under the 12th Amendment that does not produce Trump, or a failure to certify by the resolution deadline resolve Invalid. [00=Yes,01=No]`,
     kind: 'categorical',
+    // Race called early Nov 6, 2024 UTC
+    informationCutoff: Math.floor(Date.UTC(2024, 10, 6, 9, 0, 0) / 1000),
     outcomes: [
       {
         label: 'Yes',
@@ -104,6 +111,8 @@ function buildUniverses(): Record<number, UniverseNode> {
     title: 'Trump Inauguration — January 20, 2025',
     queryText: `Will Donald Trump be inaugurated as President of the United States on January 20, 2025? This market resolves Yes if Trump takes the presidential oath of office on January 20, 2025 (US Eastern Time), as the ceremony is conducted under the Twentieth Amendment — including if the public ceremony is relocated, delayed within that calendar day, or held indoors for security/weather. It resolves No if any other person is inaugurated that day, if inauguration is postponed past January 20, 2025, or if Trump does not take the oath that day. Disputes that make the oath's occurrence or date genuinely indeterminate resolve Invalid. [00=Yes,01=No]`,
     kind: 'categorical',
+    // Noon ET inauguration day
+    informationCutoff: Math.floor(Date.UTC(2025, 0, 20, 17, 5, 0) / 1000),
     outcomes: [
       {
         label: 'Yes',
@@ -118,7 +127,7 @@ function buildUniverses(): Record<number, UniverseNode> {
   }
 
   // Scalar, no outcomes= encoding in query text. Adjacent cent prices; decimals=2.
-  // Shown formula: outcomeId = answer / 10^decimals.
+  // Raw outcome id is a whole number: outcomeId = answer × 10^decimals.
   const btcA = 75432.5
   const btcB = 75432.51
   const btcDecimals = 2
@@ -128,16 +137,17 @@ function buildUniverses(): Record<number, UniverseNode> {
       'What was the BTC/USD last trade price on Coinbase at 00:00:00 UTC on November 6, 2024 (the first midnight UTC after US polls closed on Election Day 2024)? Use the Coinbase Advanced Trade BTC-USD ticker; if that feed is unavailable, fall back to the Coinbase spot BTC-USD price at that timestamp. Report the price in US dollars and cents. If multiple prints share that exact second, use the last trade stamped at or immediately before 00:00:00 UTC.',
     kind: 'scalar',
     decimals: btcDecimals,
+    informationCutoff: Math.floor(Date.UTC(2024, 10, 6, 0, 0, 0) / 1000),
     outcomes: [
       {
         label: btcA.toFixed(btcDecimals),
-        outcomeId: String(btcA / 10 ** btcDecimals),
+        outcomeId: String(Math.round(btcA * 10 ** btcDecimals)),
         childUniverseId: 5,
         isCorrect: true,
       },
       {
         label: btcB.toFixed(btcDecimals),
-        outcomeId: String(btcB / 10 ** btcDecimals),
+        outcomeId: String(Math.round(btcB * 10 ** btcDecimals)),
         childUniverseId: 6,
       },
     ],
