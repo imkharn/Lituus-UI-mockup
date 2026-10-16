@@ -155,6 +155,14 @@ export function TrueUniverseFrame({
                   setForkDecimals('0')
                   setStep({ kind: 'createFork', universeId: step.universeId })
                 }}
+                onBack={() => {
+                  const parentId = universes[step.universeId]?.parentId
+                  if (parentId == null) {
+                    setStep({ kind: 'fork', universeId: 0 })
+                    return
+                  }
+                  setStep({ kind: 'fork', universeId: parentId })
+                }}
               />
             )}
 
@@ -211,6 +219,50 @@ export function TrueUniverseFrame({
   )
 }
 
+type OutcomeChoice = {
+  label: string
+  outcomeId: string
+  childId?: number
+}
+
+/** True when the custom field takes a human answer and converts to a whole outcome id. */
+function usesDecimalAnswerInput(
+  kind: 'categorical' | 'scalar' | 'rawIds',
+  decimals: number,
+): boolean {
+  return kind === 'scalar' || decimals > 0
+}
+
+/**
+ * Parse custom input into a choice button.
+ * Scalar / decimals>0: enter the decimal answer → outcomeId = answer × 10^decimals.
+ * Otherwise: enter the raw outcome id.
+ */
+function parseCustomChoice(
+  input: string,
+  kind: 'categorical' | 'scalar' | 'rawIds',
+  decimals: number,
+): OutcomeChoice | null {
+  const raw = input.trim()
+  if (!raw) return null
+  if (
+    /^F{16,}$/i.test(raw) ||
+    raw.toLowerCase() === 'invalid'
+  ) {
+    return { label: INVALID_OUTCOME, outcomeId: INVALID_OUTCOME_HEX }
+  }
+  if (usesDecimalAnswerInput(kind, decimals)) {
+    const answer = Number(raw)
+    if (!Number.isFinite(answer) || answer < 0) return null
+    const outcomeId = String(Math.round(answer * 10 ** decimals))
+    return {
+      label: (Number(outcomeId) / 10 ** decimals).toFixed(decimals),
+      outcomeId,
+    }
+  }
+  return { label: raw, outcomeId: raw }
+}
+
 function ForkStep({
   universe,
   customId,
@@ -228,9 +280,15 @@ function ForkStep({
     fork?.kind === 'scalar' && !fork.queryText.includes('[')
   const showRawIds = fork?.kind === 'rawIds' || isScalarNoEncoding
 
+  const [extraChoices, setExtraChoices] = useState<OutcomeChoice[]>([])
+
+  useEffect(() => {
+    setExtraChoices([])
+  }, [universe.id])
+
   const buttons = useMemo(() => {
     if (!fork) return []
-    const mapped = fork.outcomes.map((o) => ({
+    const mapped: OutcomeChoice[] = fork.outcomes.map((o) => ({
       label: o.label,
       outcomeId: o.outcomeId,
       childId: o.childUniverseId,
@@ -245,14 +303,30 @@ function ForkStep({
         childId: undefined,
       })
     }
+    for (const extra of extraChoices) {
+      if (mapped.some((b) => b.outcomeId === extra.outcomeId)) continue
+      mapped.push(extra)
+    }
     return mapped
-  }, [fork, showRawIds])
+  }, [fork, showRawIds, extraChoices])
 
   if (!fork) {
     return <p className="text-sm text-gray-600">No fork query on this universe.</p>
   }
 
   const decimals = fork.decimals ?? 0
+  const decimalAnswerInput = usesDecimalAnswerInput(fork.kind, decimals)
+
+  const addCustomChoice = () => {
+    const choice = parseCustomChoice(customId, fork.kind, decimals)
+    if (!choice) return
+    if (buttons.some((b) => b.outcomeId === choice.outcomeId)) {
+      onCustomId('')
+      return
+    }
+    setExtraChoices((prev) => [...prev, choice])
+    onCustomId('')
+  }
 
   return (
     <div className="space-y-4">
@@ -297,16 +371,22 @@ function ForkStep({
           <div className="flex gap-2">
             <input
               type="text"
-              inputMode="numeric"
+              inputMode="decimal"
               value={customId}
               onChange={(e) => onCustomId(e.target.value)}
-              placeholder="Outcome id…"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  addCustomChoice()
+                }
+              }}
+              placeholder={decimalAnswerInput ? 'Answer…' : 'Outcome id…'}
               className="min-w-0 flex-1 rounded-xl border border-dashed border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus:outline-none"
             />
             <button
               type="button"
               disabled={!customId.trim()}
-              onClick={() => onSelect(customId.trim())}
+              onClick={addCustomChoice}
               className="rounded-xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-40"
             >
               Use
@@ -322,10 +402,12 @@ function LeafStep({
   universe,
   onAffirm,
   onFork,
+  onBack,
 }: {
   universe: UniverseNode
   onAffirm: () => void
   onFork: () => void
+  onBack: () => void
 }) {
   const bond = forkBondRep(universe.supply)
   const pending = Boolean(universe.pendingFork)
@@ -361,6 +443,19 @@ function LeafStep({
           {formatRep(bond)} <RepToken universeId={universe.id} /> (0.4% of
           supply)
         </span>
+      </button>
+
+      <button
+        type="button"
+        onClick={onBack}
+        className="w-full rounded-xl border border-dashed border-gray-300 bg-white px-4 py-3.5 text-left text-sm font-semibold text-gray-700 hover:bg-gray-50"
+      >
+        Back
+        {universe.parentId != null ? (
+          <span className="mt-1 block text-xs font-normal text-gray-500">
+            Return to Universe {universe.parentId} fork
+          </span>
+        ) : null}
       </button>
     </div>
   )
